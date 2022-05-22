@@ -1,98 +1,159 @@
-import base64
-import PySimpleGUI as Sg
-import os.path
-import requests
-from cbor2 import dumps, loads
+from tkinter import *
+from tkinter import messagebox
+from HSM_encrypt_decpryt import call_streaming_encrypt_decrypt
 
-end_point = "https://eu.smartkey.io/"
+from HSM_Signing import call_streaming_signing
 
 
-def generate_plain_text(plain_file, key_name):
-    yield dumps({"init": {"key": {"name": key_name}, "mode": "CBC"}})
-    with open(plain_file) as f:
-        while True:
-            data = f.read(1024)
-            if not data:
-                break
-            yield dumps({"plain": base64.b64encode(bytearray(data, 'utf-8'))})
-            # yield dumps({"plain": data})
-    yield dumps(dict(final={}))
+def second_window():
+    encrypt_decrypt_window = Tk()
+    encrypt_decrypt_window.geometry("300x300")
+    encrypt_decrypt_window.title("HSM_GUI")
+
+    def encrypt():
+        endpoint = "https://eu.smartkey.io"
+        key = api_key_text.get("1.0", "end-1c")
+        file = encrypt_file_path.get("1.0", "end-1c")
+        aes = encrypt_key_text.get("1.0", "end-1c")
+
+        call_streaming_encrypt_decrypt(endpoint, key, file, out_data='file_encrypted', key_name=aes,
+                                       operation='encrypt')
+
+    def decrypt():
+        endpoint = "https://eu.smartkey.io/"
+        key = api_key_text.get("1.0", "end-1c")
+        file = encrypt_file_path.get("1.0", "end-1c")
+        aes = encrypt_key_text.get("1.0", "end-1c")
+        iv = iv_text.get("1.0", "end-1c")
+
+        call_streaming_encrypt_decrypt(endpoint, key, file, out_data='file_encrypted.txt', key_name=aes,
+                                       operation='decrypt', iv=iv)
+
+    encrypt_key = Label(encrypt_decrypt_window, text='Enter Key name')
+
+    encrypt_key_text = Text(encrypt_decrypt_window, height=2,
+                            width=15,
+                            bg="light yellow")
+
+    api_key = Label(encrypt_decrypt_window, text='Enter API Key')
+
+    api_key_text = Text(encrypt_decrypt_window, height=2,
+                        width=15,
+                        bg="light yellow")
+
+    encrypt_file = Label(encrypt_decrypt_window, text='Enter file name')
+    encrypt_file_path = Text(encrypt_decrypt_window, height=2,
+                             width=15,
+                             bg="light yellow")
+
+    iv_label = Label(encrypt_decrypt_window, text='Enter iv for decryption')
+    iv_text = Text(encrypt_decrypt_window, height=2,
+                   width=15,
+                   bg="light yellow")
+
+    encrypt_bt = Button(encrypt_decrypt_window, height=2,
+                        width=20,
+                        text="encrypt",
+                        command=lambda: [encrypt(), encrypt_decrypt_window.destroy()])
+    decrypt_bt = Button(encrypt_decrypt_window, height=2,
+                        width=20,
+                        text="decrypt",
+                        command=lambda: [decrypt(), encrypt_decrypt_window.destroy()])
+
+    api_key.grid(column=1, row=1)
+    api_key_text.grid(column=2, row=1)
+
+    encrypt_key.grid(column=1, row=2)
+    encrypt_key_text.grid(column=2, row=2)
+
+    encrypt_file.grid(column=1, row=4)
+    encrypt_file_path.grid(column=2, row=4)
+
+    iv_label.grid(column=1, row=5)
+    iv_text.grid(column=2, row=5)
+
+    encrypt_bt.grid(column=1, row=6)
+    decrypt_bt.grid(column=2, row=6)
+
+    mainloop()
 
 
-# def encrypt(token_value: object, data: object) -> object:
-#     # init streaming
-#     header = {"Authorization": f"Bearer {token_value}", "Content-type": "application/cbor-seq", "Accept": "*/*"}
-#     print('Started Encryption')
-#     if os.path.exists(cipher_file):
-#          open(cipher_file, 'w').close()
-#     # generator send request in chunks
-#     # refer: https://docs.python-requests.org/en/latest/user/advanced/#chunk-encoded-requests
-#     # store binary response in file
-#     with requests.post(f"{end_point}/crypto/v1/stream/encrypt", data= data, headers=header, stream=True) as r:
-#         for data in r.iter_content(chunk_size=None):
-#             for key, value in loads(data).items():
-#                 if key == 'cipher':
-#                     with open(cipher_file, "ab") as binary_file:
-#                         # Write text or bytes to the file
-#                         binary_file.write(value)
-#                         # num_bytes_written = binary_file.write(value)
-#                         # print("Wrote %d bytes." % num_bytes_written)
+def third_window():
+    signing_window = Tk()
+    signing_window.geometry("300x170")
+    signing_window.title("HSM_GUI")
 
-# print('Done')
+    def signing():
+        endpoint = "https://eu.smartkey.io/"
+        key = api_key_text.get("1.0", "end-1c")
+        file = sign_file_path.get("1.0", "end-1c")
+        signing_key = sign_key_text.get("1.0", "end-1c")
 
+        call_streaming_signing(endpoint, key, file, out_data='file_signed.txt', key_name=signing_key,
+                               operation='sign')
 
-def authentication(api_key):
-    headers = {
-        'Authorization': f"Basic {api_key}"
-    }
-    response = requests.post(f"{end_point}/sys/v1/session/auth", headers=headers)
-    return response.json()['access_token']
+    sign_key = Label(signing_window, text='Enter Key name')
 
+    sign_key_text = Text(signing_window, height=2,
+                         width=15,
+                         bg="light yellow")
 
-def open_window(first_window_values):
-    new_window_layout = [[Sg.Text("Choose a file: "), Sg.Input(), Sg.FileBrowse(key="-IN-")],
-                         [Sg.T('Enter API key')], [Sg.In(k='-key1-')],
-                         [Sg.T('Enter key name')], [Sg.In(k='-key2-')], [Sg.Button("Submit", key="open")]]
-    second_window = Sg.Window("HSM_GUI_insert_Data", new_window_layout, modal=True, size=(800, 400))
-    while True:
-        event, second_window_values = second_window.read()
-        if event in (None, 'Cancel'):
-            break
+    api_key = Label(signing_window, text='Enter API Key')
 
-        # print(first_window_values)
-        # print(second_window_values)
+    api_key_text = Text(signing_window, height=2,
+                        width=15,
+                        bg="light yellow")
 
-        plain_file = os.path.split(second_window_values['-IN-'])
-        api_key = second_window_values['-key1-']
-        key_name = second_window_values['-key2-']
-        plain_file = plain_file[1]
+    sign_file = Label(signing_window, text='Enter file name')
+    sign_file_path = Text(signing_window, height=2,
+                          width=15,
+                          bg="light yellow")
 
-        # print(plain_file)
-        # print(key_name)
+    sign_bt = Button(signing_window, height=2,
+                     width=20,
+                     text="sign",
+                     command=lambda: [signing(), signing_window.destroy()])
 
-        token_value = authentication(api_key)
-        print(token_value)
-        data = generate_plain_text(plain_file, key_name)
-        print(data)
-        # encrypt(token_value, data)
-        second_window.close()
+    api_key.grid(column=1, row=1)
+    api_key_text.grid(column=2, row=1)
+
+    sign_key.grid(column=1, row=2)
+    sign_key_text.grid(column=2, row=2)
+
+    sign_file.grid(column=1, row=4)
+    sign_file_path.grid(column=2, row=4)
+
+    sign_bt.grid(column=2, row=6, columnspan=3, sticky=EW)
+
+    mainloop()
 
 
-def main():
-    layout = [[Sg.Radio('Encryption', 'num', default=True),
-               Sg.Radio('Signing', 'num', default=False)],
-              [Sg.Button('Submit')]]
+operation_window = Tk()
+operation_window.geometry('400x150')
+operation_window.title('Choose operation')
 
-    window = Sg.Window('HSM_GUI_choose_crypto_action', layout, size=(600, 300))
+frame = Frame(operation_window)
+frame.pack()
 
-    while True:  # Event Loop
-        event, first_window_values = window.Read()
-        if event in (None, 'Cancel'):
-            break
-        # print(event, first_window_values)
-        window.close()
-        open_window(first_window_values)
+operation_selection = IntVar()
+radio_signing_btn = Radiobutton(frame, text="Signing", variable=operation_selection,
+                                value=1)
+radio_signing_btn.pack(padx=10, pady=10)
+radio_encryption_btn = Radiobutton(frame, text="Encryption and Decryption ", variable=operation_selection,
+                                   value=2)
+radio_encryption_btn.pack(padx=10, pady=10)
 
 
-if __name__ == "__main__":
-    main()
+def check_value():
+    if operation_selection.get() == 1:
+        print("Signing")
+        third_window()
+    if operation_selection.get() == 2:
+        print("encryption/decryption")
+        second_window()
+
+
+Btn = Button(frame, text="Submit", command=lambda: [operation_window.destroy(), check_value()])
+
+Btn.pack()
+operation_window.mainloop()
