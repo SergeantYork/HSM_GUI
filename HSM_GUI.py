@@ -1,3 +1,4 @@
+import tkinter
 from tkinter import *
 from tkinter import messagebox
 from HSM_encrypt_decpryt import call_streaming_encrypt_decrypt
@@ -78,19 +79,20 @@ def second_window():
     mainloop()
 
 
+def signing(sign_key_text, api_key_text, sign_file_path, signing_algorithm):
+    endpoint = "https://eu.smartkey.io/"
+    key = api_key_text.get("1.0", "end-1c")
+    file = sign_file_path.get("1.0", "end-1c")
+    signing_key = sign_key_text.get("1.0", "end-1c")
+
+    call_streaming_signing(endpoint, key, file, out_data='file_signed.txt', key_name=signing_key,
+                           operation=signing_algorithm)
+
+
 def third_window():
-    signing_window = Tk()
-    signing_window.geometry("300x170")
+    signing_window = tkinter.Tk()
+    signing_window.geometry("300x300")
     signing_window.title("HSM_GUI")
-
-    def signing():
-        endpoint = "https://eu.smartkey.io/"
-        key = api_key_text.get("1.0", "end-1c")
-        file = sign_file_path.get("1.0", "end-1c")
-        signing_key = sign_key_text.get("1.0", "end-1c")
-
-        call_streaming_signing(endpoint, key, file, out_data='file_signed.txt', key_name=signing_key,
-                               operation='sign')
 
     sign_key = Label(signing_window, text='Enter Key name')
 
@@ -109,10 +111,18 @@ def third_window():
                           width=15,
                           bg="light yellow")
 
+    options_list = ["SHA2-128", "SHA2-256", "SHA3-128", "SHA3-256"]
+    signing_algorithm = tkinter.StringVar(signing_window)
+    signing_algorithm.set("Select an Option")
+    multiple_choice = OptionMenu(signing_window, signing_algorithm, *options_list)
+
+    print(signing_algorithm.get())
+
     sign_bt = Button(signing_window, height=2,
                      width=20,
                      text="sign",
-                     command=lambda: [signing(), signing_window.destroy()])
+                     command=lambda: [signing(sign_key_text, api_key_text, sign_file_path, signing_algorithm),
+                                      signing_window.destroy()])
 
     api_key.grid(column=1, row=1)
     api_key_text.grid(column=2, row=1)
@@ -122,6 +132,8 @@ def third_window():
 
     sign_file.grid(column=1, row=4)
     sign_file_path.grid(column=2, row=4)
+
+    multiple_choice.grid(column=1, row=5)
 
     sign_bt.grid(column=2, row=6, columnspan=3, sticky=EW)
 

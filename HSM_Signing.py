@@ -1,23 +1,36 @@
 #!/usr/bin/python
 
 from __future__ import print_function
+import shutil
 
 import argparse
 import base64
 import os
-import sys
+
 import sdkms
 
 import sdkms.v1
 
-from sdkms.v1.models.cipher_mode import CipherMode
 from sdkms.v1.models.object_type import ObjectType
 from sdkms.v1.models.digest_algorithm import DigestAlgorithm
-from sdkms.v1.models.elliptic_curve import EllipticCurve
 
 api_instances = {}
 ca_certificate = None
 cl_args = None
+
+
+def append_new_line(file_name, text_to_append):
+    """Append given text as a new line at the end of file"""
+    # Open the file in append & read mode ('a+')
+    with open(file_name, "a+") as file_object:
+        # Move read cursor to the start of file.
+        file_object.seek(0)
+        # If file is not empty then append '\n'
+        data = file_object.read(100)
+        if len(data) > 0:
+            file_object.write("\n")
+        # Append text at the end of file
+        file_object.write(text_to_append)
 
 
 def print_debug(*args, **kwargs):
@@ -29,7 +42,7 @@ def get_api_instance(name):
     return api_instances[name]
 
 
-def parse_arguments(api_endpoint , api_key):
+def parse_arguments(api_endpoint, api_key):
     parser = argparse.ArgumentParser(description='SDKMS API perf/stress test')
 
     # This construction allows us to use the API endpoint if it's specified
@@ -138,9 +151,13 @@ def signing(in_data, key_name):
     digest_request = sdkms.v1.DigestRequest(alg=DigestAlgorithm.SHA256, data=data)
     digest = get_api_instance('digest').compute_digest(digest_request).digest
     print(".......SHA2-Digest Generation")
-    key_name = "b4224df8-e564-458f-ab78-5503a93b9fef"  #For RSA only
+    key_name = "b4224df8-e564-458f-ab78-5503a93b9fef"  # For RSA only
     sign_request = sdkms.v1.SignRequest(hash_alg=DigestAlgorithm.SHA256, hash=digest)
     sign_result = get_api_instance('signverify').sign(key_name, sign_request)
+    hash_sign_string = str(sign_result.signature)
+    print(hash_sign_string)
+    shutil.copyfile(in_data, '{}_signing.txt'.format(in_data))
+    append_new_line('{}_signing.txt'.format(in_data), hash_sign_string)
     print(".......SHA2-Signing")
     verify_request = sdkms.v1.VerifyRequest(hash_alg=DigestAlgorithm.SHA256, hash=digest,
                                             signature=sign_result.signature)
@@ -151,6 +168,7 @@ def signing(in_data, key_name):
 
 def main(api_endpoint, api_key, in_data, out_data, key_name, operation):
     ObjectType.RSA
+    print(operation)
     parse_arguments(api_endpoint, api_key)
     initialize_api_clients()
     signing(in_data, key_name)
