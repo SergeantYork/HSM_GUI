@@ -49,11 +49,7 @@ def encryption_decryption_window():
 
     def browse_files():
         filename = filedialog.askopenfilename(initialdir="/",
-                                              title="Select a File",
-                                              filetypes=(("Text files",
-                                                          "*.txt*"),
-                                                         ("all files",
-                                                          "*.*")))
+                                              title="Select a File")
 
         encrypt_file_path.configure(text="" + filename)
 
