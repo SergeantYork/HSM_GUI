@@ -1,11 +1,9 @@
 #!/usr/bin/python
 from __future__ import print_function
-import shutil
-
 import argparse
 import base64
 import os
-
+import hashlib
 import sdkms
 
 import sdkms.v1
@@ -43,9 +41,9 @@ def get_api_instance(name):
 def parse_arguments(api_endpoint, api_key):
     parser = argparse.ArgumentParser(description='SDKMS API perf/stress test')
 
-    # This construction allows us to use the API endpoint if it's specified
-    # on the command-line, then use the environment variable if it's set,
-    # then use the program-default endpoint if neither is set.
+    """This construction allows us to use the API endpoint if it's specified
+       on the command-line, then use the environment variable if it's set,
+       then use the program-default endpoint if neither is set"""
 
     parser.add_argument('--api-endpoint',
                         default=os.getenv('FORTANIX_API_ENDPOINT',
@@ -81,8 +79,7 @@ def parse_arguments(api_endpoint, api_key):
 
 
 def initialize_api_clients():
-    # don't need to do this parsing in the client code.
-
+    # Start the session using the API key
     api_key = base64.b64decode(cl_args.api_key).decode('ascii')
     print_debug('Using API key {}'.format(api_key))
     parts = api_key.split(':')
@@ -133,35 +130,49 @@ def initialize_api_clients():
         api_client=client)
 
 
-def turn_to_byte_array(in_data):
-    input_file = open(in_data, "r")
-    data = input_file.read()
-    input_file.close()
-    encoded_data = data.encode()
-    data_byte_array = bytearray(encoded_data)
-    return data_byte_array
+def hash_file(filename):
+    """"This function returns the SHA-256 hash
+   of the file passed into it"""
+
+    # make a hash object
+    h = hashlib.sha256()
+
+    # open file for reading in binary mode
+    with open(filename, 'rb') as file:
+        # loop till the end of the file
+        chunk = 0
+        while chunk != b'':
+            # read only 1024 bytes at a time
+            chunk = file.read(1024)
+            h.update(chunk)
+
+    # return the hex representation of digest
+    return h.digest()
 
 
 def get_key_id(name):
+    """This function turns key name e.g "RSA_Test" and return the UUID"""
     api_key = get_api_instance('sobjects').get_security_objects(name=name)[0]
     return api_key.kid
 
 
 def signing(in_data, key_name, operation):
-    # This is a signing function using the regular functionality no API streaming digest is done on the computer
-    # and sent to the SaaS HSM for signing
+    """This is a signing function using the regular functionality no API streaming digest is done on the computer
+       and sent to the SaaS HSM for signing"""
 
     print("signing:{}".format(operation))
     # "SHA2-256", "SHA3-256"
     key_uuid = get_key_id(key_name)
 
     if operation == 'SHA3-256':
-        data = turn_to_byte_array(in_data)
-        digest_request = sdkms.v1.DigestRequest(alg=DigestAlgorithm.SHA3_256, data=data)
-        digest = get_api_instance('digest').compute_digest(digest_request).digest
+        result = hash_file(in_data)
+
+        result_digest = bytearray(result)
+
+        print("my digest:{}".format(result_digest))
 
         print(".......SHA3-Digest Generation")
-        sign_request = sdkms.v1.SignRequest(hash_alg=DigestAlgorithm.SHA3_256, hash=digest)
+        sign_request = sdkms.v1.SignRequest(hash_alg=DigestAlgorithm.SHA3_256, hash=result_digest)
         sign_result = get_api_instance('signverify').sign(key_uuid, sign_request)
 
         hash_sign_string = str(sign_result.signature)
@@ -176,7 +187,7 @@ def signing(in_data, key_name, operation):
         append_new_line('{}_signature.{}'.format(in_data, file_ending), signature)
 
         print(".......SHA3-Signing")
-        verify_request = sdkms.v1.VerifyRequest(hash_alg=DigestAlgorithm.SHA3_256, hash=digest,
+        verify_request = sdkms.v1.VerifyRequest(hash_alg=DigestAlgorithm.SHA3_256, hash=result_digest,
                                                 signature=sign_result.signature)
 
         verify_result = get_api_instance('signverify').verify(key_uuid, verify_request)
@@ -184,12 +195,14 @@ def signing(in_data, key_name, operation):
         print(".......SHA3-Verification")
 
     if operation == 'SHA2-256':
-        data = turn_to_byte_array(in_data)
-        digest_request = sdkms.v1.DigestRequest(alg=DigestAlgorithm.SHA256, data=data)
-        digest = get_api_instance('digest').compute_digest(digest_request).digest
+        result = hash_file(in_data)
+
+        result_digest = bytearray(result)
+
+        print("my digest:{}".format(result_digest))
 
         print(".......SHA2-Digest Generation")
-        sign_request = sdkms.v1.SignRequest(hash_alg=DigestAlgorithm.SHA256, hash=digest)
+        sign_request = sdkms.v1.SignRequest(hash_alg=DigestAlgorithm.SHA256, hash=result_digest)
         sign_result = get_api_instance('signverify').sign(key_uuid, sign_request)
 
         hash_sign_string = str(sign_result.signature)
@@ -201,10 +214,11 @@ def signing(in_data, key_name, operation):
 
         with open('{}_signature.{}'.format(in_data, file_ending), 'w') as f:
             f.write('Hash signature:')
+
         append_new_line('{}_signature.{}'.format(in_data, file_ending), signature)
 
         print(".......SHA2-Signing")
-        verify_request = sdkms.v1.VerifyRequest(hash_alg=DigestAlgorithm.SHA256, hash=digest,
+        verify_request = sdkms.v1.VerifyRequest(hash_alg=DigestAlgorithm.SHA256, hash=result_digest,
                                                 signature=sign_result.signature)
 
         verify_result = get_api_instance('signverify').verify(key_uuid, verify_request)
@@ -215,9 +229,9 @@ def signing(in_data, key_name, operation):
 def main(api_endpoint, api_key, in_data, out_data, key_name, operation):
     parse_arguments(api_endpoint, api_key)
     initialize_api_clients()
-    print(in_data)
     signing(in_data, key_name, operation)
 
 
 def call_streaming_signing(api_endpoint, api_key, in_data, out_data, key_name, operation):
+    """call streaming method to pass the values from the GUI"""
     main(api_endpoint, api_key, in_data, out_data, key_name, operation)

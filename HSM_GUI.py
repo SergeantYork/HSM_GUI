@@ -1,6 +1,4 @@
-import os
 import tkinter as tk
-
 from tkinter import *
 from HSM_encrypt_decpryt import call_streaming_encrypt_decrypt
 from HSM_Signing import call_streaming_signing
