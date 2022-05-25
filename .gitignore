@@ -127,3 +127,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/file_encrypted
+/.idea/HSM_GUI.iml
+/kid_iv.txt
+/LICENSE
+/.idea/misc.xml
+/.idea/modules.xml
+/plain_text.txt
+/.idea/inspectionProfiles/profiles_settings.xml
+/tets.py
+/.idea/vcs.xml
