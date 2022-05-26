@@ -8,6 +8,8 @@ import aiohttp
 import aioitertools
 import cbor2
 
+from datetime import datetime
+
 my_os = platform.system()
 if my_os == 'linux':
     import uvloop
@@ -31,7 +33,10 @@ def append_new_line(file_name, text_to_append):
         file_object.write(text_to_append)
 
 
-async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint):
+async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, file_name):
+    print(".....encryption started....")
+    now = datetime.now()
+
     start = time.time()
     plain_chunks = chunk_input_file(plain_in)
     request_items = aioitertools.chain(
@@ -52,26 +57,36 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint):
         response_items = decode_cbor_stream(response.content.iter_any())
         async for item in response_items:
 
+            if item != "final":
+                print("encryption is running time = ", now)
+
             if "init" in item:
                 init = item["init"]
                 print("kid: {}, iv: {}".format(init["kid"], init["iv"].hex()))
-                with open('kid_iv.txt', 'w') as f:
+                with open('{}_kid_iv.txt'.format(file_name), 'w') as f:
                     f.write('Your KID and IV for later decryption:')
-                append_new_line('kid_iv.txt', 'kid:{}'.format(init["kid"]))
-                append_new_line('kid_iv.txt', 'iv:{}'.format(init["iv"].hex()))
+                append_new_line('{}_kid_iv.txt'.format(file_name), 'kid:{}'.format(init["kid"]))
+                append_new_line('{}_kid_iv.txt'.format(file_name), 'iv:{}'.format(init["iv"].hex()))
+
             elif "cipher" in item:
                 await cipher_out.write(item["cipher"])
+
             elif "final" in item:
                 end = time.time()
                 print("Processed in ! {:.2f} seconds".format(end - start))
+                print(".....encryption finished....")
                 break
+
             elif "error" in item:
                 print("received error frame: {}".format(item["error"]))
                 break
 
 
 async def decrypt(plain_in, cipher_out, key_name, bearer, client, iv, api_endpoint):
+
     start = time.time()
+    now = datetime.now()
+
     plain_chunks = chunk_input_file(plain_in)
     request_items = aioitertools.chain(
         ({"init": {"key": {"name": key_name}, "mode": "CBC", "iv": bytes.fromhex(iv)}},),
@@ -90,7 +105,10 @@ async def decrypt(plain_in, cipher_out, key_name, bearer, client, iv, api_endpoi
         # for demonstration; in real impl improve error handling
         response_items = decode_cbor_stream(response.content.iter_any())
         async for item in response_items:
-            # print(item)
+
+            if item != "final":
+                print("encryption is running time = ", now)
+
             if "init" in item:
                 init = item["init"]
                 print("kid: {}".format(init["kid"]))
@@ -140,13 +158,13 @@ async def get_auth(client, api_endpoint, api_key):
         return body["access_token"]
 
 
-async def main(api_endpoint, api_key, in_data, out_data, key_name, operation, iv):
+async def main(api_endpoint, api_key, in_data, out_data, key_name, operation, iv, file_name):
     async with aiohttp.ClientSession() as client:
         auth = await get_auth(client, api_endpoint, api_key)
         async with aiofiles.open(in_data, "rb") as in_data:
             async with aiofiles.open(out_data, "wb") as out_data:
                 if operation == "encrypt":
-                    await encrypt(in_data, out_data, key_name, auth, client, api_endpoint)
+                    await encrypt(in_data, out_data, key_name, auth, client, api_endpoint, file_name)
                 if operation == "decrypt":
                     await decrypt(in_data, out_data, key_name, auth, client, iv, api_endpoint)
 
@@ -160,4 +178,5 @@ def call_streaming_encrypt_decrypt(api_endpoint, api_key, in_data, out_data, key
     if check_os == 'linux':
         asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
-    asyncio.run(main(api_endpoint, api_key, in_data, out_data, key_name, operation, iv))
+    file_name = str(in_data)
+    asyncio.run(main(api_endpoint, api_key, in_data, out_data, key_name, operation, iv, file_name))
