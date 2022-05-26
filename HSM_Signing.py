@@ -15,6 +15,8 @@ ca_certificate = None
 cl_args = None
 
 
+# TODO: create a digest screen
+
 def append_new_line(file_name, text_to_append):
     """Append given text as a new line at the end of file"""
     # Open the file in append & read mode ('a+')

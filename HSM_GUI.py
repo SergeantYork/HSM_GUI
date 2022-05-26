@@ -125,11 +125,7 @@ def sign_window():
 
     def browse_files():
         filename = filedialog.askopenfilename(initialdir="/",
-                                              title="Select a File",
-                                              filetypes=(("Text files",
-                                                          "*.txt*"),
-                                                         ("all files",
-                                                          "*.*")))
+                                              title="Select a File")
 
         sign_file_path.configure(text="" + filename)
 
