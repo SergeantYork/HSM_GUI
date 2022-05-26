@@ -132,12 +132,16 @@ def initialize_api_clients():
         api_client=client)
 
 
-def hash_file(filename):
+def hash_file(filename, operation):
     """"This function returns the SHA-256 hash
    of the file passed into it"""
 
     # make a hash object
-    h = hashlib.sha256()
+    if operation == 'SHA2-256':
+        h = hashlib.sha256()
+
+    if operation == 'SHA3-256':
+        h = hashlib.sha3_256()
 
     # open file for reading in binary mode
     with open(filename, 'rb') as file:
@@ -167,7 +171,7 @@ def signing(in_data, key_name, operation):
     key_uuid = get_key_id(key_name)
 
     if operation == 'SHA3-256':
-        result = hash_file(in_data)
+        result = hash_file(in_data, operation)
 
         result_digest = bytearray(result)
 
@@ -197,7 +201,7 @@ def signing(in_data, key_name, operation):
         print(".......SHA3-Verification")
 
     if operation == 'SHA2-256':
-        result = hash_file(in_data)
+        result = hash_file(in_data, operation)
 
         result_digest = bytearray(result)
 

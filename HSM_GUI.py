@@ -1,9 +1,15 @@
+import os
 import tkinter as tk
 from tkinter import *
 from HSM_encrypt_decpryt import call_streaming_encrypt_decrypt
 from HSM_Signing import call_streaming_signing
 from tkinter import filedialog
 
+
+# TODO: open terminal window
+# TODO: API & key error message
+# TODO: correct sha3 encryption with Dipak
+# TODO: add version
 
 def encryption_decryption_window():
     encrypt_decrypt_window = Tk()
@@ -16,8 +22,10 @@ def encryption_decryption_window():
         file = encrypt_file_path.cget("text")
         aes = encrypt_key_text.get("1.0", "end-1c")
 
-        call_streaming_encrypt_decrypt(endpoint, key, file, out_data='file_encrypted', key_name=aes,
-                                       operation='encrypt')
+        file_ending = file.split(".")
+        file_ending = file_ending[-1]
+        call_streaming_encrypt_decrypt(endpoint, key, file, out_data='{}_encrypted.{}'.format(file, file_ending),
+                                       key_name=aes, operation='encrypt')
 
     def decrypt():
         endpoint = "https://eu.smartkey.io/"
@@ -26,8 +34,14 @@ def encryption_decryption_window():
         aes = encrypt_key_text.get("1.0", "end-1c")
         iv = iv_text.get("1.0", "end-1c")
 
-        call_streaming_encrypt_decrypt(endpoint, key, file, out_data='file_encrypted.txt', key_name=aes,
-                                       operation='decrypt', iv=iv)
+        file_path = file.partition('_encrypted')[0]
+        print(file_path)
+
+        file_ending = file.split(".")
+        file_ending = file_ending[-1]
+
+        call_streaming_encrypt_decrypt(endpoint, key, file, out_data='{}_decrypted.{}'.format(file_path, file_ending),
+                                       key_name=aes, operation='decrypt', iv=iv)
 
     encrypt_key = Label(encrypt_decrypt_window, text='Enter Key name')
 
@@ -103,7 +117,7 @@ def signing(sign_key_text, api_key_text, sign_file_path, signing_algorithm):
 def sign_window():
     signing_window = tk.Tk()
     signing_window.geometry("800x400")
-    signing_window.title("HSM_GUI")
+    signing_window.title("HSM Tool")
 
     sign_key = Label(signing_window, text='Enter Key name')
 
@@ -138,7 +152,7 @@ def sign_window():
 
     options_list = ["SHA2-256", "SHA3-256"]
     signing_algorithm = StringVar()
-    signing_algorithm.set("Select an option")
+    signing_algorithm.set("Select hash function")
     multiple_choice = tk.OptionMenu(signing_window, signing_algorithm, *options_list, command=print_sign)
 
     api_key.grid(column=1, row=1)
