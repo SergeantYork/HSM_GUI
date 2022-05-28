@@ -12,10 +12,6 @@ from tkinter import filedialog
 # TODO: add version
 
 def encryption_decryption_window():
-    encrypt_decrypt_window = Tk()
-    encrypt_decrypt_window.geometry("800x400")
-    encrypt_decrypt_window.title("HSM_GUI")
-
     def encrypt():
         endpoint = "https://eu.smartkey.io"
         key = api_key_text.get("1.0", "end-1c")
@@ -43,22 +39,36 @@ def encryption_decryption_window():
         call_streaming_encrypt_decrypt(endpoint, key, file, out_data='{}_decrypted.{}'.format(file_path, file_ending),
                                        key_name=aes, operation='decrypt', iv=iv)
 
-    encrypt_key = Label(encrypt_decrypt_window, text='Enter Key name')
+    encrypt_decrypt_window = Tk()
+    encrypt_decrypt_window.geometry('{}x{}'.format(800, 400))
+    encrypt_decrypt_window.title("HSM_GUI")
+    top_frame = Frame(encrypt_decrypt_window, bg='cyan', width=800, height=200)
+    bottom_frame = Frame(encrypt_decrypt_window, bg='black', width=800, height=200)
 
-    encrypt_key_text = Text(encrypt_decrypt_window, height=2,
-                            width=15,
+    encrypt_decrypt_window.grid_rowconfigure(1, weight=1)
+    encrypt_decrypt_window.grid_columnconfigure(0, weight=1)
+
+    top_frame.grid(row=0, column=0)
+    bottom_frame.grid(row=1, column=0)
+    wid = bottom_frame.winfo_id()
+    os.system('xterm -into %d -geometry 40x20 -sb &' % wid)
+
+    encrypt_key = Label(top_frame, text='Enter Key name')
+
+    encrypt_key_text = Text(top_frame, height=2,
+                            width=40,
                             bg="light yellow")
 
-    api_key = Label(encrypt_decrypt_window, text='Enter API Key')
+    api_key = Label(top_frame, text='Enter API Key')
 
-    api_key_text = Text(encrypt_decrypt_window, height=2,
-                        width=15,
+    api_key_text = Text(top_frame, height=2,
+                        width=40,
                         bg="light yellow")
 
-    encrypt_file = Label(encrypt_decrypt_window, text='Enter file name')
+    encrypt_file = Label(top_frame, text='Enter file name')
 
-    encrypt_file_path = Label(encrypt_decrypt_window, height=2,
-                              width=15,
+    encrypt_file_path = Label(top_frame, height=2,
+                              width=40,
                               bg="light yellow")
 
     def browse_files():
@@ -67,40 +77,40 @@ def encryption_decryption_window():
 
         encrypt_file_path.configure(text="" + filename)
 
-    button_explore = Button(encrypt_decrypt_window,
+    button_explore = Button(top_frame,
                             text="Browse Files",
                             command=browse_files)
 
-    iv_label = Label(encrypt_decrypt_window, text='Enter iv for decryption')
-    iv_text = Text(encrypt_decrypt_window, height=2,
-                   width=15,
+    iv_label = Label(top_frame, text='Enter iv for decryption')
+    iv_text = Text(top_frame, height=2,
+                   width=40,
                    bg="light yellow")
 
-    encrypt_bt = Button(encrypt_decrypt_window, height=2,
-                        width=20,
+    encrypt_bt = Button(top_frame, height=2,
+                        width=40,
                         text="encrypt",
                         command=lambda: [encrypt(), encrypt_decrypt_window.destroy()])
-    decrypt_bt = Button(encrypt_decrypt_window, height=2,
-                        width=20,
+    decrypt_bt = Button(top_frame, height=2,
+                        width=40,
                         text="decrypt",
                         command=lambda: [decrypt(), encrypt_decrypt_window.destroy()])
 
-    api_key.grid(column=1, row=1)
-    api_key_text.grid(column=2, row=1)
+    api_key.grid(column=0, row=1)
+    api_key_text.grid(column=1, row=1)
 
-    encrypt_key.grid(column=1, row=2)
-    encrypt_key_text.grid(column=2, row=2)
+    encrypt_key.grid(column=0, row=2)
+    encrypt_key_text.grid(column=1, row=2)
 
-    encrypt_file.grid(column=1, row=4)
-    encrypt_file_path.grid(column=2, row=4)
+    encrypt_file.grid(column=0, row=4)
+    encrypt_file_path.grid(column=1, row=4)
 
-    button_explore.grid(column=3, row=4)
+    button_explore.grid(column=2, row=4)
 
-    iv_label.grid(column=1, row=5)
-    iv_text.grid(column=2, row=5)
+    iv_label.grid(column=0, row=5)
+    iv_text.grid(column=1, row=5)
 
-    encrypt_bt.grid(column=1, row=6)
-    decrypt_bt.grid(column=2, row=6)
+    encrypt_bt.grid(column=0, row=6)
+    decrypt_bt.grid(column=1, row=6)
 
     mainloop()
 
