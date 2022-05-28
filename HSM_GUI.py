@@ -40,7 +40,7 @@ def encryption_decryption_window():
                                        key_name=aes, operation='decrypt', iv=iv)
 
     encrypt_decrypt_window = Tk()
-    encrypt_decrypt_window.geometry('{}x{}'.format(800, 400))
+    encrypt_decrypt_window.geometry('{}x{}'.format(900, 400))
     encrypt_decrypt_window.title("HSM_GUI")
     top_frame = Frame(encrypt_decrypt_window, bg='cyan', width=800, height=200)
     bottom_frame = Frame(encrypt_decrypt_window, bg='black', width=800, height=200)
