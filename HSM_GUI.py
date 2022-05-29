@@ -51,7 +51,7 @@ def encryption_decryption_window():
     top_frame.grid(row=0, column=0)
     bottom_frame.grid(row=1, column=0)
     wid = bottom_frame.winfo_id()
-    os.system('xterm -into %d -geometry 40x20 -sb &' % wid)
+    os.system('xterm -into %d -geometry 450x200 -sb &' % wid)
 
     encrypt_key = Label(top_frame, text='Enter Key name')
 
