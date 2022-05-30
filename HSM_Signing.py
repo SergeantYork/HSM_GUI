@@ -206,8 +206,8 @@ def signing(in_data, key_name, operation):
         result_digest = bytearray(result)
 
         print("my digest:{}".format(result_digest))
-
         print(".......SHA2-Digest Generation")
+
         sign_request = sdkms.v1.SignRequest(hash_alg=DigestAlgorithm.SHA256, hash=result_digest)
         sign_result = get_api_instance('signverify').sign(key_uuid, sign_request)
 
