@@ -4,8 +4,6 @@ import io
 import os
 import platform
 import time
-from datetime import datetime
-from time import sleep
 import aiofiles
 import aiohttp
 import aioitertools
@@ -104,7 +102,7 @@ async def decrypt(plain_in, cipher_out, key_name, bearer, client, iv, api_endpoi
     #                                                                progressbar.Percentage()])
     print()
     # bar.start()
-    i = 0
+    # i = 0
     plain_chunks = chunk_input_file(plain_in)
     request_items = aioitertools.chain(
         ({"init": {"key": {"name": key_name}, "mode": "CBC", "iv": bytes.fromhex(iv)}},),
@@ -180,7 +178,8 @@ async def get_auth(client, api_endpoint, api_key):
 
 
 async def main(api_endpoint, api_key, in_data, out_data, key_name, operation, iv, file_name):
-    async with aiohttp.ClientSession() as client:
+    time_out = aiohttp.ClientTimeout(total=10000)
+    async with aiohttp.ClientSession(timeout=time_out) as client:
         auth = await get_auth(client, api_endpoint, api_key)
         async with aiofiles.open(in_data, "rb") as in_data:
 

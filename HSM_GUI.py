@@ -31,7 +31,7 @@ def signing_file_window():
             signing_algorithm = 'SHA3-256'
         digest = False
         call_streaming_signing(endpoint, api_key, file, out_data='file_signed.txt', key_name=signing_key,
-                               operation=signing_algorithm,digest=digest)
+                               operation=signing_algorithm, digest=digest)
 
     customtkinter.set_appearance_mode("dark")  # Modes: "System" (standard), "Dark", "Light"
     customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -288,7 +288,7 @@ def encrypt_file_window():
     button_2.grid(row=4, column=2, columnspan=2, pady=10, padx=20, sticky="E")
 
     button_1 = customtkinter.CTkButton(master=frame_1, corner_radius=8,
-                                       command=lambda: [signing_window.destroy(), encrypt(),operation_window()],
+                                       command=lambda: [signing_window.destroy(), encrypt(), operation_window()],
                                        text="Encrypt", fg_color=("blue", "green"), height=40,
                                        width=400)
     button_1.grid(row=5, column=2, pady=10, padx=20, sticky="W")
