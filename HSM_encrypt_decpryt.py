@@ -93,17 +93,16 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
                 break
 
 
-async def decrypt(plain_in, cipher_out, key_name, bearer, client, iv, api_endpoint):
+async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, file_name, iv):
     start = time.time()
-    # file_stat = os.stat(plain_in)
-    # iteration_value = (file_stat.st_size / BLOCK_SIZE)
-    #
-    # bar = progressbar.ProgressBar(maxval=iteration_value, widgets=[progressbar.Bar('=', '[', ']'), ' ',
-    #                                                                progressbar.Percentage()])
+    file_stat = os.stat(file_name)
+    iteration_value = (file_stat.st_size / BLOCK_SIZE)
+    bar = progressbar.ProgressBar(maxval=iteration_value, widgets=[progressbar.Bar('=', '[', ']'), ' ',
+                                                                   progressbar.Percentage()])
+    bar.start()
     print()
-    # bar.start()
-    # i = 0
-    plain_chunks = chunk_input_file(plain_in)
+    i = 0
+    plain_chunks = chunk_input_file(cipher_in)
     request_items = aioitertools.chain(
         ({"init": {"key": {"name": key_name}, "mode": "CBC", "iv": bytes.fromhex(iv)}},),
         ({"cipher": bytes(chunk)} async for chunk in plain_chunks),
@@ -115,6 +114,7 @@ async def decrypt(plain_in, cipher_out, key_name, bearer, client, iv, api_endpoi
                            data=request_bytes
                            ) as response:
         if response.status != 200:
+            print()
             print("HTTP error: {}: {}".format(response.status, await response.text()))
             return
 
@@ -122,20 +122,23 @@ async def decrypt(plain_in, cipher_out, key_name, bearer, client, iv, api_endpoi
         response_items = decode_cbor_stream(response.content.iter_any())
         async for item in response_items:
 
-            # if item != "final":
-            #     if i < (iteration_value - 1):
-            #         i = i + 1
-            #     bar.update(i)
+            if item != "final":
+                if i < (iteration_value - 1):
+                    i = i + 1
+                    bar.update(i)
+                    print()
 
             if "init" in item:
                 init = item["init"]
-                print("kid: {}".format(init["kid"]))
             elif "plain" in item:
-                await cipher_out.write(item["plain"])
+                await plain_out.write(item["plain"])
             elif "final" in item:
                 end = time.time()
-                # bar.finish()
-                print("Process in {:.2f}".format(end - start))
+                bar.finish()
+                print()
+                print("Process in {:.2f} seconds".format(end - start))
+                print(".....decryption finished....")
+
                 break
             elif "error" in item:
                 print("received error frame: {}".format(item["error"]))
@@ -190,7 +193,7 @@ async def main(api_endpoint, api_key, in_data, out_data, key_name, operation, iv
                     await encrypt(in_data, out_data, key_name, auth, client, api_endpoint, file_name)
                 if operation == "decrypt":
                     print(".....decryption started....")
-                    await decrypt(in_data, out_data, key_name, auth, client, iv, api_endpoint)
+                    await decrypt(in_data, out_data, key_name, auth, client, api_endpoint, file_name, iv)
 
 
 def call_streaming_encrypt_decrypt(api_endpoint, api_key, in_data, out_data, key_name, operation, iv=None):
