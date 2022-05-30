@@ -97,13 +97,13 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
 
 async def decrypt(plain_in, cipher_out, key_name, bearer, client, iv, api_endpoint):
     start = time.time()
-    file_stat = os.stat(plain_in)
-    iteration_value = (file_stat.st_size / BLOCK_SIZE)
-
-    bar = progressbar.ProgressBar(maxval=iteration_value, widgets=[progressbar.Bar('=', '[', ']'), ' ',
-                                                                   progressbar.Percentage()])
+    # file_stat = os.stat(plain_in)
+    # iteration_value = (file_stat.st_size / BLOCK_SIZE)
+    #
+    # bar = progressbar.ProgressBar(maxval=iteration_value, widgets=[progressbar.Bar('=', '[', ']'), ' ',
+    #                                                                progressbar.Percentage()])
     print()
-    bar.start()
+    # bar.start()
     i = 0
     plain_chunks = chunk_input_file(plain_in)
     request_items = aioitertools.chain(
@@ -124,10 +124,10 @@ async def decrypt(plain_in, cipher_out, key_name, bearer, client, iv, api_endpoi
         response_items = decode_cbor_stream(response.content.iter_any())
         async for item in response_items:
 
-            if item != "final":
-                if i < (iteration_value - 1):
-                    i = i + 1
-                bar.update(i)
+            # if item != "final":
+            #     if i < (iteration_value - 1):
+            #         i = i + 1
+            #     bar.update(i)
 
             if "init" in item:
                 init = item["init"]
@@ -136,7 +136,7 @@ async def decrypt(plain_in, cipher_out, key_name, bearer, client, iv, api_endpoi
                 await cipher_out.write(item["plain"])
             elif "final" in item:
                 end = time.time()
-                bar.finish()
+                # bar.finish()
                 print("Process in {:.2f}".format(end - start))
                 break
             elif "error" in item:

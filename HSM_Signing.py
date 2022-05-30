@@ -232,12 +232,80 @@ def signing(in_data, key_name, operation):
         print(".......SHA2-Verification")
 
 
-def main(api_endpoint, api_key, in_data, out_data, key_name, operation):
+def signing_digest(in_data, key_name, operation):
+    """This is a signing function using the regular functionality no API streaming digest is done on the computer
+       and sent to the SaaS HSM for signing"""
+
+    print("signing:{}".format(operation))
+    # "SHA2-256", "SHA3-256"
+    key_uuid = get_key_id(key_name)
+
+    if operation == 'SHA3-256':
+        fh = open("{}".format(in_data), 'rb')
+        result_digest = bytearray(fh.read)
+
+        print("my digest:{}".format(result_digest))
+
+        sign_request = sdkms.v1.SignRequest(hash_alg=DigestAlgorithm.SHA3_256, hash=result_digest)
+        sign_result = get_api_instance('signverify').sign(key_uuid, sign_request)
+
+        hash_sign_string = str(sign_result.signature)
+        signature = hash_sign_string.split("bytearray")
+        signature = signature[-1]
+        file_name = str(in_data)
+        file_ending = file_name.split(".")
+        file_ending = file_ending[-1]
+
+        with open('{}_signature.{}'.format(in_data, file_ending), 'w') as f:
+            f.write('Hash signature:')
+        append_new_line('{}_signature.{}'.format(in_data, file_ending), signature)
+
+        print(".......SHA3-Signing")
+        verify_request = sdkms.v1.VerifyRequest(hash_alg=DigestAlgorithm.SHA3_256, hash=result_digest,
+                                                signature=sign_result.signature)
+
+        verify_result = get_api_instance('signverify').verify(key_uuid, verify_request)
+        assert verify_result.result, "SHA3-Signature verification didn't succeed!"
+        print(".......SHA3-Verification")
+
+    if operation == 'SHA2-256':
+        fh = open("{}".format(in_data), 'rb')
+        result_digest = bytearray(fh.read)
+        print("my digest:{}".format(result_digest))
+
+        sign_request = sdkms.v1.SignRequest(hash_alg=DigestAlgorithm.SHA256, hash=result_digest)
+        sign_result = get_api_instance('signverify').sign(key_uuid, sign_request)
+
+        hash_sign_string = str(sign_result.signature)
+        signature = hash_sign_string.split("bytearray")
+        signature = signature[-1]
+        file_ending = str(in_data)
+        file_ending = file_ending.split(".")
+        file_ending = file_ending[-1]
+
+        with open('{}_signature.{}'.format(in_data, file_ending), 'w') as f:
+            f.write('Hash signature:')
+
+        append_new_line('{}_signature.{}'.format(in_data, file_ending), signature)
+
+        print(".......SHA2-Signing")
+        verify_request = sdkms.v1.VerifyRequest(hash_alg=DigestAlgorithm.SHA256, hash=result_digest,
+                                                signature=sign_result.signature)
+
+        verify_result = get_api_instance('signverify').verify(key_uuid, verify_request)
+        assert verify_result.result, "SHA2-Signature verification didn't succeed!"
+        print(".......SHA2-Verification")
+
+
+def main(api_endpoint, api_key, in_data, out_data, key_name, operation, digest):
     parse_arguments(api_endpoint, api_key)
     initialize_api_clients()
-    signing(in_data, key_name, operation)
+    if digest:
+        signing_digest(in_data, key_name, operation)
+    else:
+        signing(in_data, key_name, operation)
 
 
-def call_streaming_signing(api_endpoint, api_key, in_data, out_data, key_name, operation):
+def call_streaming_signing(api_endpoint, api_key, in_data, out_data, key_name, operation, digest):
     """call streaming method to pass the values from the GUI"""
-    main(api_endpoint, api_key, in_data, out_data, key_name, operation)
+    main(api_endpoint, api_key, in_data, out_data, key_name, operation, digest)
