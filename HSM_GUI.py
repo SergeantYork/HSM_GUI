@@ -64,7 +64,7 @@ def signing_file_window():
 
     frame_2.grid(row=1, column=1, padx=10, pady=y_padding)
 
-    img = ImageTk.PhotoImage(Image.open("logo.png").resize((450, 100)))
+    img = ImageTk.PhotoImage(Image.open("logo.jpg").resize((450, 100)))
     image_2 = customtkinter.CTkLabel(master=frame_2, image=img, bg_color="white")
     image_2.grid(row=1, column=1)
 
@@ -162,7 +162,7 @@ def signing_digest_window():
 
     frame_2.grid(row=1, column=1, padx=10, pady=y_padding)
 
-    img = ImageTk.PhotoImage(Image.open("logo.png").resize((450, 100)))
+    img = ImageTk.PhotoImage(Image.open("logo.jpg").resize((450, 100)))
     image_2 = customtkinter.CTkLabel(master=frame_2, image=img, bg_color="white")
     image_2.grid(row=1, column=1)
 
@@ -258,7 +258,7 @@ def encrypt_file_window():
 
     frame_2.grid(row=1, column=1, padx=10, pady=y_padding)
 
-    img = ImageTk.PhotoImage(Image.open("logo.png").resize((450, 100)))
+    img = ImageTk.PhotoImage(Image.open("logo.jpg").resize((450, 100)))
     image_2 = customtkinter.CTkLabel(master=frame_2, image=img, bg_color="white")
     image_2.grid(row=1, column=1)
 
@@ -288,10 +288,10 @@ def encrypt_file_window():
     button_2.grid(row=4, column=2, columnspan=2, pady=10, padx=20, sticky="E")
 
     button_1 = customtkinter.CTkButton(master=frame_1, corner_radius=8,
-                                       command=lambda: [signing_window.destroy(), encrypt(), operation_window()],
+                                       command=lambda: [signing_window.destroy(), encrypt()],
                                        text="Encrypt", fg_color=("blue", "green"), height=40,
                                        width=400)
-    button_1.grid(row=5, column=2, pady=10, padx=20, sticky="W")
+    button_1.grid(row=7, column=2, pady=10, padx=20, sticky="W")
 
     signing_window.mainloop()
 
@@ -349,7 +349,7 @@ def decrypt_file_window():
 
     frame_2.grid(row=1, column=1, padx=10, pady=y_padding)
 
-    img = ImageTk.PhotoImage(Image.open("logo.png").resize((450, 100)))
+    img = ImageTk.PhotoImage(Image.open("logo.jpg").resize((450, 100)))
     image_2 = customtkinter.CTkLabel(master=frame_2, image=img, bg_color="white")
     image_2.grid(row=1, column=1)
 
@@ -384,7 +384,7 @@ def decrypt_file_window():
     button_2.grid(row=5, column=2, columnspan=2, pady=10, padx=20, sticky="E")
 
     button_1 = customtkinter.CTkButton(master=frame_1, corner_radius=8,
-                                       command=lambda: [signing_window.destroy(), decrypt(), operation_window()],
+                                       command=lambda: [signing_window.destroy(), decrypt()],
                                        text="Decrypt", fg_color=("blue", "green"), height=40,
                                        width=400)
     button_1.grid(row=6, column=2, pady=10, padx=20, sticky="W")
@@ -423,7 +423,6 @@ def operation_window():
 
     image = Image.open(PATH + "/HSMsymmetrickey_0.jpg").resize((WIDTH, HEIGHT))
     app.bg_image = ImageTk.PhotoImage(image)
-
     app.image_label = tkinter.Label(master=app, image=app.bg_image)
     app.image_label.place(relx=0.5, rely=0.5, anchor=CENTER)
 
@@ -431,7 +430,8 @@ def operation_window():
     frame_2 = customtkinter.CTkFrame(master=app, corner_radius=15)
     frame_1.grid(row=0, column=1, padx=(100, 100))
     frame_2.grid(row=1, column=1, padx=10, pady=y_padding)
-    img = ImageTk.PhotoImage(Image.open("logo.png").resize((450, 150)))
+
+    img = ImageTk.PhotoImage(Image.open("logo.jpg").resize((450, 150)))
     image_2 = customtkinter.CTkLabel(master=frame_2, image=img, bg_color="white")
     image_2.grid(row=1, column=1)
     label_1 = customtkinter.CTkLabel(master=frame_1, justify=tkinter.LEFT,

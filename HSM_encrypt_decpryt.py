@@ -1,20 +1,26 @@
 #!/usr/bin/env python3
 import asyncio
 import io
-import os
 import platform
+import sys
 import time
 import aiofiles
 import aiohttp
 import aioitertools
 import cbor2
 import progressbar
+import os
+
+from my_progress_bar_window import ProgressWindow
 
 my_os = platform.system()
 if my_os == 'linux':
     import uvloop
 
 BLOCK_SIZE = 511 * 1024
+PATH = os.path.dirname(os.path.realpath(__file__))
+WIDTH = 1000
+HEIGHT = 700
 
 
 def append_new_line(file_name, text_to_append):
@@ -32,15 +38,16 @@ def append_new_line(file_name, text_to_append):
 
 
 async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, file_name):
+    progress_window = ProgressWindow()
     file_stat = os.stat(file_name)
-    iteration_value = (file_stat.st_size / BLOCK_SIZE)
-    bar = progressbar.ProgressBar(maxval=iteration_value,
+    number_of_iterations = (file_stat.st_size / BLOCK_SIZE)
+    bar = progressbar.ProgressBar(maxval=number_of_iterations,
                                   widgets=[progressbar.Bar('=', '[', ']'), ' ',
                                            progressbar.Percentage()])
     print()
     bar.start()
-
     i = 0
+    progress_window.terminal_output.configure(text="Encryption started",font=("Roboto", 10, "bold"))
     start = time.time()
     plain_chunks = chunk_input_file(plain_in)
     request_items = aioitertools.chain(
@@ -59,15 +66,16 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
 
         # for demonstration; in real impl improve error handling
         response_items = decode_cbor_stream(response.content.iter_any())
-
         async for item in response_items:
 
             if item != "final":
-                if i < (iteration_value - 1):
+                if i < (number_of_iterations - 1):
                     i = i + 1
                 bar.update(i)
+                progress_bar_update = (i / number_of_iterations)
+                progress_window.progress_bar.set(progress_bar_update)
+                progress_window.update_idletasks()
 
-                # add progress bar here
             if "init" in item:
                 init = item["init"]
                 with open('{}_kid_iv.txt'.format(file_name), 'w') as f:
@@ -83,9 +91,13 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
             elif "final" in item:
                 end = time.time()
                 bar.finish()
+                progress_window.progress_bar.set(number_of_iterations)
                 print("Processed in ! {:.2f} seconds".format(end - start))
                 print("kid: {}, iv: {}".format(init["kid"], init["iv"].hex()))
                 print(".....encryption finished....")
+                progress_window.terminal_output.configure(text="Processed in ! {:.2f} seconds\n"
+                                                               "Encryption finished".format(end-start),
+                                                          font=("Roboto", 10, "bold"))
                 break
 
             elif "error" in item:
@@ -138,7 +150,6 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
                 print()
                 print("Process in {:.2f} seconds".format(end - start))
                 print(".....decryption finished....")
-
                 break
             elif "error" in item:
                 print("received error frame: {}".format(item["error"]))
