@@ -5,17 +5,13 @@ import base64
 import os
 import hashlib
 import sdkms
-
 import sdkms.v1
-
 from sdkms.v1.models.digest_algorithm import DigestAlgorithm
 
 api_instances = {}
 ca_certificate = None
 cl_args = None
 
-
-# TODO: create a digest screen
 
 def append_new_line(file_name, text_to_append):
     """Append given text as a new line at the end of file"""
@@ -165,8 +161,8 @@ def get_key_id(name):
 def signing(in_data, key_name, operation):
     """This is a signing function using the regular functionality no API streaming digest is done on the computer
        and sent to the SaaS HSM for signing"""
-
     print("signing:{}".format(operation))
+
     # "SHA2-256", "SHA3-256"
     key_uuid = get_key_id(key_name)
 

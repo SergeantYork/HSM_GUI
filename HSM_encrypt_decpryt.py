@@ -8,7 +8,7 @@ import aioitertools
 import cbor2
 import os
 import io
-from my_progress_bar_window import ProgressWindow
+from encryption_decryption_process_window import ProgressWindow
 
 my_os = platform.system()
 if my_os == 'linux':

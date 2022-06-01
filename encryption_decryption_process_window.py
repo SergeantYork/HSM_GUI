@@ -55,25 +55,25 @@ class ProgressWindow(customtkinter.CTk):
         self.terminal_output = customtkinter.CTkLabel(master=self.frame_1,
                                                       text="")
         self.terminal_output.configure(font=("Roboto", 10, "bold"))
-        self.terminal_output.grid(row=3, column=2, columnspan=4, pady=10, padx=0, sticky="W")
+        self.terminal_output.grid(row=3, column=2, columnspan=4, pady=10, padx=20, sticky="")
 
         self.terminal_output.configure(font=("Roboto", 14, "bold"))
 
-        self.progress_bar = customtkinter.CTkProgressBar(master=self.frame_1, width=1200)
+        self.progress_bar = customtkinter.CTkProgressBar(master=self.frame_1, width=400)
         self.progress_bar.grid(row=2, column=2, columnspan=4, pady=10, padx=20, sticky="W")
         self.progress_bar.set(0)
 
         self.button_1 = customtkinter.CTkButton(master=self.frame_1, corner_radius=8,
                                                 command=lambda: [self.destroy(), open_operation_window()],
                                                 text="Main menu", fg_color=("blue", "green"), height=40,
-                                                width=500)
-        self.button_1.grid(row=4, column=2, pady=10, padx=40, sticky="W")
+                                                width=200)
+        self.button_1.grid(row=4, column=2, pady=10, padx=20, sticky="W")
 
         self.button_2 = customtkinter.CTkButton(master=self.frame_1, corner_radius=8,
                                                 command=lambda: [self.destroy()],
                                                 text="End", fg_color=("blue", "green"), height=40,
-                                                width=500)
-        self.button_2.grid(row=4, column=4, pady=10, padx=0, sticky="E")
+                                                width=200)
+        self.button_2.grid(row=4, column=4, pady=10, padx=20, sticky="E")
 
     def on_closing(self):
         self.destroy()
