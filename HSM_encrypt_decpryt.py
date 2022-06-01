@@ -97,7 +97,7 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
                 print("kid: {}, iv: {}".format(init["kid"], init["iv"].hex()))
                 print(".....encryption finished....")
                 progress_window.terminal_output.configure(text="Processed in ! {:.2f} seconds\n"
-                                                               "Encryption finished".format(end-start),
+                                                               "Encryption finished".format(end - start),
                                                           font=("Roboto", 10, "bold"))
                 break
 
@@ -108,13 +108,16 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
 
 async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, file_name, iv):
     start = time.time()
+    progress_window = ProgressWindow()
     file_stat = os.stat(file_name)
-    iteration_value = (file_stat.st_size / BLOCK_SIZE)
-    bar = progressbar.ProgressBar(maxval=iteration_value, widgets=[progressbar.Bar('=', '[', ']'), ' ',
-                                                                   progressbar.Percentage()])
+    number_of_iterations = (file_stat.st_size / BLOCK_SIZE)
+    bar = progressbar.ProgressBar(maxval=number_of_iterations, widgets=[progressbar.Bar('=', '[', ']'), ' ',
+                                                                        progressbar.Percentage()])
     bar.start()
     print()
     i = 0
+    progress_window.terminal_output.configure(text="Encryption started",
+                                              font=("Roboto", 10, "bold"))
     plain_chunks = chunk_input_file(cipher_in)
     request_items = aioitertools.chain(
         ({"init": {"key": {"name": key_name}, "mode": "CBC", "iv": bytes.fromhex(iv)}},),
@@ -136,10 +139,12 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
         async for item in response_items:
 
             if item != "final":
-                if i < (iteration_value - 1):
+                if i < (number_of_iterations - 1):
                     i = i + 1
                     bar.update(i)
-                    print()
+                progress_bar_update = (i / number_of_iterations)
+                progress_window.progress_bar.set(progress_bar_update)
+                progress_window.update_idletasks()
 
             if "init" in item:
                 init = item["init"]
@@ -148,9 +153,13 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
             elif "final" in item:
                 end = time.time()
                 bar.finish()
+                progress_window.progress_bar.set(number_of_iterations)
                 print()
                 print("Process in {:.2f} seconds".format(end - start))
                 print(".....decryption finished....")
+                progress_window.terminal_output.configure(text="Processed in ! {:.2f} seconds\n"
+                                                               "Encryption finished".format(end - start),
+                                                          font=("Roboto", 10, "bold"))
                 break
             elif "error" in item:
                 print("received error frame: {}".format(item["error"]))
