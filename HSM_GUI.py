@@ -105,7 +105,7 @@ def signing_file_window():
     button_2.grid(row=5, column=2, columnspan=2, pady=10, padx=20, sticky="E")
 
     button_1 = customtkinter.CTkButton(master=frame_1, corner_radius=8,
-                                       command=lambda: [signing_window.destroy(), sign(), main()],
+                                       command=lambda: [signing_window.destroy(), sign()],
                                        text="Sign", fg_color=("blue", "green"), height=40,
                                        width=400)
     button_1.grid(row=6, column=2, pady=10, padx=20, sticky="W")
@@ -203,7 +203,7 @@ def signing_digest_window():
     button_2.grid(row=5, column=2, columnspan=2, pady=10, padx=20, sticky="E")
 
     button_1 = customtkinter.CTkButton(master=frame_1, corner_radius=8,
-                                       command=lambda: [signing_window.destroy(), sign(), main()],
+                                       command=lambda: [signing_window.destroy(), sign()],
                                        text="Sign", fg_color=("blue", "green"), height=40,
                                        width=400)
     button_1.grid(row=6, column=2, pady=10, padx=20, sticky="W")

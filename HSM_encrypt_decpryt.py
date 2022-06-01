@@ -108,6 +108,7 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
     progress_window.terminal_output.configure(text="Decryption started",
                                               font=("Roboto", 10, "bold"))
     plain_chunks = chunk_input_file(cipher_in)
+    print("decryption started")
     request_items = aioitertools.chain(
         ({"init": {"key": {"name": key_name}, "mode": "CBC", "iv": bytes.fromhex(iv)}},),
         ({"cipher": bytes(chunk)} async for chunk in plain_chunks),
@@ -132,6 +133,7 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
             if item != "final":
                 if i < (number_of_iterations - 1):
                     i = i + 1
+                print("print not final")
                 progress_bar_update = (i / number_of_iterations)
                 progress_window.progress_bar.set(progress_bar_update)
                 progress_window.update_idletasks()
