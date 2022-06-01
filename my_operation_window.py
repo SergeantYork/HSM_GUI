@@ -6,7 +6,6 @@ import os
 
 from PIL import Image, ImageTk
 
-
 PATH = os.path.dirname(os.path.realpath(__file__))
 WIDTH = 1600
 HEIGHT = 1200
@@ -25,16 +24,12 @@ class OperationWindow(customtkinter.CTk):
 
         print("operation selected {}".format(self.operation_selection.get()))
         if self.operation_selection.get() == 1:
-            print("Start signing file")
             signing_file_window()
         if self.operation_selection.get() == 2:
-            print("Start signing digest")
             signing_digest_window()
         if self.operation_selection.get() == 3:
-            print("Start encryption")
             encrypt_file_window()
         if self.operation_selection.get() == 4:
-            print("Start decryption")
             decrypt_file_window()
 
     def __init__(self):
@@ -63,8 +58,9 @@ class OperationWindow(customtkinter.CTk):
         self.frame_2 = customtkinter.CTkFrame(master=self, corner_radius=15)
         self.frame_2.grid(row=1, column=1, padx=10, pady=y_padding)
 
-        self.img = ImageTk.PhotoImage(Image.open("logo.jpg").resize((450, 100)))
-        self.image_2 = customtkinter.CTkLabel(self.frame_2, image=self.img, bg_color="white")
+        img = Image.open(PATH + "/logo.png").resize((450, 100))
+        self.logo_image = ImageTk.PhotoImage(img)
+        self.image_2 = customtkinter.CTkLabel(self.frame_2, image=self.logo_image, bg_color="white")
         self.image_2.grid(row=1, column=1)
 
         self.frame_1.grid(row=0, column=1, padx=10, pady=y_padding)
@@ -95,7 +91,7 @@ class OperationWindow(customtkinter.CTk):
 
         self.radio_button_4 = customtkinter.CTkRadioButton(master=self.frame_1,
                                                            variable=self.operation_selection, value=4,
-                                                           text="Encryption",
+                                                           text="Decryption",
                                                            text_font=("Roboto Small", -15))
         self.radio_button_4.grid(row=5, column=2, pady=10, padx=20, sticky="W")
 

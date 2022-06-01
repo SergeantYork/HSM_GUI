@@ -42,7 +42,7 @@ class ProgressWindow(customtkinter.CTk):
         self.frame_2 = customtkinter.CTkFrame(master=self, corner_radius=15)
         self.frame_2.grid(row=1, column=1, padx=10, pady=y_padding)
 
-        self.img = ImageTk.PhotoImage(Image.open("logo.jpg").resize((450, 100)))
+        self.img = ImageTk.PhotoImage(Image.open("logo.png").resize((450, 100)))
         self.image_2 = customtkinter.CTkLabel(self.frame_2, image=self.img, bg_color="white")
         self.image_2.grid(row=1, column=1)
 
@@ -55,7 +55,7 @@ class ProgressWindow(customtkinter.CTk):
         self.terminal_output = customtkinter.CTkLabel(master=self.frame_1,
                                                       text="")
         self.terminal_output.configure(font=("Roboto", 10, "bold"))
-        self.terminal_output.grid(row=3, column=2, columnspan=2, pady=10, padx=0, sticky="")
+        self.terminal_output.grid(row=3, column=2, columnspan=4, pady=10, padx=0, sticky="W")
 
         self.terminal_output.configure(font=("Roboto", 14, "bold"))
 

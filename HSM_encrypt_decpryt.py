@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 import asyncio
-import io
 import platform
-import sys
 import time
 import aiofiles
 import aiohttp
 import aioitertools
 import cbor2
-import progressbar
 import os
-
+import io
 from my_progress_bar_window import ProgressWindow
 
 my_os = platform.system()
@@ -41,11 +38,6 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
     progress_window = ProgressWindow()
     file_stat = os.stat(file_name)
     number_of_iterations = (file_stat.st_size / BLOCK_SIZE)
-    bar = progressbar.ProgressBar(maxval=number_of_iterations,
-                                  widgets=[progressbar.Bar('=', '[', ']'), ' ',
-                                           progressbar.Percentage()])
-    print()
-    bar.start()
     i = 0
     progress_window.terminal_output.configure(text="Encryption started",
                                               font=("Roboto", 10, "bold"))
@@ -63,6 +55,9 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
                            ) as response:
         if response.status != 200:
             print("HTTP error: {}: {}".format(response.status, await response.text()))
+            progress_window.terminal_output.configure("HTTP error: {}: {}".format(response.status,
+                                                                                  await response.text()),
+                                                      font=("Roboto", 10, "bold"))
             return
 
         # for demonstration; in real impl improve error handling
@@ -72,7 +67,6 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
             if item != "final":
                 if i < (number_of_iterations - 1):
                     i = i + 1
-                bar.update(i)
                 progress_bar_update = (i / number_of_iterations)
                 progress_window.progress_bar.set(progress_bar_update)
                 progress_window.update_idletasks()
@@ -91,10 +85,8 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
 
             elif "final" in item:
                 end = time.time()
-                bar.finish()
                 progress_window.progress_bar.set(number_of_iterations)
                 print("Processed in ! {:.2f} seconds".format(end - start))
-                print("kid: {}, iv: {}".format(init["kid"], init["iv"].hex()))
                 print(".....encryption finished....")
                 progress_window.terminal_output.configure(text="Processed in ! {:.2f} seconds\n"
                                                                "Encryption finished".format(end - start),
@@ -103,6 +95,7 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
 
             elif "error" in item:
                 print("received error frame: {}".format(item["error"]))
+                progress_window.terminal_output.configure(text="received error frame: {}".format(item["error"]))
                 break
 
 
@@ -111,12 +104,8 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
     progress_window = ProgressWindow()
     file_stat = os.stat(file_name)
     number_of_iterations = (file_stat.st_size / BLOCK_SIZE)
-    bar = progressbar.ProgressBar(maxval=number_of_iterations, widgets=[progressbar.Bar('=', '[', ']'), ' ',
-                                                                        progressbar.Percentage()])
-    bar.start()
-    print()
     i = 0
-    progress_window.terminal_output.configure(text="Encryption started",
+    progress_window.terminal_output.configure(text="Decryption started",
                                               font=("Roboto", 10, "bold"))
     plain_chunks = chunk_input_file(cipher_in)
     request_items = aioitertools.chain(
@@ -130,8 +119,10 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
                            data=request_bytes
                            ) as response:
         if response.status != 200:
-            print()
             print("HTTP error: {}: {}".format(response.status, await response.text()))
+            progress_window.terminal_output.configure(text="HTTP error: {}: {}".format(response.status,
+                                                                                       await response.text()),
+                                                      font=("Roboto", 10, "bold"))
             return
 
         # for demonstration; in real impl improve error handling
@@ -141,27 +132,24 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
             if item != "final":
                 if i < (number_of_iterations - 1):
                     i = i + 1
-                    bar.update(i)
                 progress_bar_update = (i / number_of_iterations)
                 progress_window.progress_bar.set(progress_bar_update)
                 progress_window.update_idletasks()
 
-            if "init" in item:
-                init = item["init"]
             elif "plain" in item:
                 await plain_out.write(item["plain"])
+
             elif "final" in item:
                 end = time.time()
-                bar.finish()
                 progress_window.progress_bar.set(number_of_iterations)
-                print()
                 print("Process in {:.2f} seconds".format(end - start))
                 print(".....decryption finished....")
                 progress_window.terminal_output.configure(text="Processed in ! {:.2f} seconds\n"
-                                                               "Encryption finished".format(end - start),
+                                                               "Decryption finished".format(end - start),
                                                           font=("Roboto", 10, "bold"))
                 break
             elif "error" in item:
+                progress_window.terminal_output.configure(text="received error frame: {}".format(item["error"]))
                 print("received error frame: {}".format(item["error"]))
                 break
 
@@ -209,11 +197,8 @@ async def main(api_endpoint, api_key, in_data, out_data, key_name, operation, iv
 
             async with aiofiles.open(out_data, "wb") as out_data:
                 if operation == "encrypt":
-                    print(".....encryption started....")
-                    print()
                     await encrypt(in_data, out_data, key_name, auth, client, api_endpoint, file_name)
                 if operation == "decrypt":
-                    print(".....decryption started....")
                     await decrypt(in_data, out_data, key_name, auth, client, api_endpoint, file_name, iv)
 
 

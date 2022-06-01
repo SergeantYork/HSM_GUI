@@ -65,7 +65,7 @@ def signing_file_window():
 
     frame_2.grid(row=1, column=1, padx=10, pady=y_padding)
 
-    img = ImageTk.PhotoImage(Image.open("logo.jpg").resize((450, 100)))
+    img = ImageTk.PhotoImage(Image.open("logo.png").resize((450, 100)))
     image_2 = customtkinter.CTkLabel(master=frame_2, image=img, bg_color="white")
     image_2.grid(row=1, column=1)
 
@@ -163,7 +163,7 @@ def signing_digest_window():
 
     frame_2.grid(row=1, column=1, padx=10, pady=y_padding)
 
-    img = ImageTk.PhotoImage(Image.open("logo.jpg").resize((450, 100)))
+    img = ImageTk.PhotoImage(Image.open("logo.png").resize((450, 100)))
     image_2 = customtkinter.CTkLabel(master=frame_2, image=img, bg_color="white")
     image_2.grid(row=1, column=1)
 
@@ -259,7 +259,7 @@ def encrypt_file_window():
 
     frame_2.grid(row=1, column=1, padx=10, pady=y_padding)
 
-    img = ImageTk.PhotoImage(Image.open("logo.jpg").resize((450, 100)))
+    img = ImageTk.PhotoImage(Image.open("logo.png").resize((450, 100)))
     image_2 = customtkinter.CTkLabel(master=frame_2, image=img, bg_color="white")
     image_2.grid(row=1, column=1)
 
@@ -350,7 +350,7 @@ def decrypt_file_window():
 
     frame_2.grid(row=1, column=1, padx=10, pady=y_padding)
 
-    img = ImageTk.PhotoImage(Image.open("logo.jpg").resize((450, 100)))
+    img = ImageTk.PhotoImage(Image.open("logo.png").resize((450, 100)))
     image_2 = customtkinter.CTkLabel(master=frame_2, image=img, bg_color="white")
     image_2.grid(row=1, column=1)
 
