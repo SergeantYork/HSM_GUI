@@ -5,6 +5,7 @@ import customtkinter
 import os
 
 from PIL import Image, ImageTk
+from my_operation_window import OperationWindow
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 WIDTH = 1600
@@ -18,7 +19,6 @@ class ProgressWindow(customtkinter.CTk):
 
     def __init__(self):
         super().__init__()
-
         self.title("Faurecia HSM Tool")
         self.geometry(f"{WIDTH}x{HEIGHT}")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)  # call .on_closing() when app gets closed
@@ -64,7 +64,7 @@ class ProgressWindow(customtkinter.CTk):
         self.progress_bar.set(0)
 
         self.button_1 = customtkinter.CTkButton(master=self.frame_1, corner_radius=8,
-                                                command=lambda: [],
+                                                command=lambda: [self.destroy(), open_operation_window()],
                                                 text="Main menu", fg_color=("blue", "green"), height=40,
                                                 width=500)
         self.button_1.grid(row=4, column=2, pady=10, padx=40, sticky="W")
@@ -78,8 +78,10 @@ class ProgressWindow(customtkinter.CTk):
     def on_closing(self):
         self.destroy()
 
-    def update_progress_bar(self, progress):
-        self.progress_bar.set(progress)
+
+def open_operation_window():
+    operation_window = OperationWindow()
+    operation_window.mainloop()
 
 
 if __name__ == "__main__":

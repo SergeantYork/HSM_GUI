@@ -47,7 +47,8 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
     print()
     bar.start()
     i = 0
-    progress_window.terminal_output.configure(text="Encryption started",font=("Roboto", 10, "bold"))
+    progress_window.terminal_output.configure(text="Encryption started",
+                                              font=("Roboto", 10, "bold"))
     start = time.time()
     plain_chunks = chunk_input_file(plain_in)
     request_items = aioitertools.chain(
