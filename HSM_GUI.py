@@ -15,22 +15,22 @@ from my_operation_window import OperationWindow
 PATH = os.path.dirname(os.path.realpath(__file__))
 WIDTH = 1600
 HEIGHT = 1200
-check_os = platform.system()
 
-if check_os == 'Windows':
-    # insert same method for windows
-    print("you need to solve this windows")
-
-if check_os == 'linux':
-    # open our log file
-    se = so = open("log_file.txt", 'w')
-
-    # re-open stdout without buffering
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w')
-
-    # redirect stdout and stderr to the log file opened above
-    os.dup2(so.fileno(), sys.stdout.fileno())
-    os.dup2(se.fileno(), sys.stderr.fileno())
+# check_os = platform.system()
+# if check_os == 'Windows':
+#     # insert same method for windows
+#     print("you need to solve this windows")
+#
+# if check_os == 'linux':
+#     # open our log file
+#     se = so = open("log_file.txt", 'w')
+#
+#     # re-open stdout without buffering
+#     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w')
+#
+#     # redirect stdout and stderr to the log file opened above
+#     os.dup2(so.fileno(), sys.stdout.fileno())
+#     os.dup2(se.fileno(), sys.stderr.fileno())
 
 
 def signing_file_window():
@@ -412,6 +412,21 @@ def decrypt_file_window():
 
 
 def main():
+    f = open("log_file.txt", 'a')
+    f.write("log file:")
+    f.close()
+
+    # open our log file
+    se = so = open("log_file.txt", 'w')
+
+    # re-open stdout without buffering
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w')
+
+    # redirect stdout and stderr to the log file opened above
+    os.dup2(so.fileno(), sys.stdout.fileno())
+    os.dup2(se.fileno(), sys.stderr.fileno())
+    print("sgfsgsgs")
+
     operation_window = OperationWindow()
     operation_window.mainloop()
 
