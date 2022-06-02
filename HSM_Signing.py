@@ -6,7 +6,7 @@ import os
 import hashlib
 import sdkms
 import sdkms.v1
-import time
+import platform
 
 from sdkms.v1.models.digest_algorithm import DigestAlgorithm
 from signing_file_digest_window import SigningProgressWindow
@@ -15,6 +15,7 @@ from time import sleep
 api_instances = {}
 ca_certificate = None
 cl_args = None
+PATH = os.path.dirname(os.path.realpath(__file__))
 
 
 def append_new_line(file_name, text_to_append):
@@ -235,6 +236,7 @@ def signing(in_data, key_name, operation):
         signing_process_window.progress_bar.set(0.33)
         signing_process_window.update_idletasks()
         sleep(2)
+
         sign_request = sdkms.v1.SignRequest(hash_alg=DigestAlgorithm.SHA256, hash=result_digest)
         sign_result = get_api_instance('signverify').sign(key_uuid, sign_request)
 

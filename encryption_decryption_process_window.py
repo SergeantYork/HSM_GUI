@@ -1,6 +1,7 @@
+import platform
 import tkinter
 import tkinter.messagebox
-from tkinter import CENTER, W, E
+from tkinter import CENTER, W, E, END, BOTTOM, Tk, Frame, LEFT, Button, Text
 import customtkinter
 import os
 
@@ -19,7 +20,7 @@ class ProgressWindow(customtkinter.CTk):
 
     def __init__(self):
         super().__init__()
-        self.title("Faurecia HSM Tool")
+        self.title("Faurecia HSM Application")
         self.geometry(f"{WIDTH}x{HEIGHT}")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)  # call .on_closing() when app gets closed
 
@@ -59,21 +60,27 @@ class ProgressWindow(customtkinter.CTk):
 
         self.terminal_output.configure(font=("Roboto", 14, "bold"))
 
-        self.progress_bar = customtkinter.CTkProgressBar(master=self.frame_1, width=400)
-        self.progress_bar.grid(row=2, column=2, columnspan=4, pady=10, padx=20, sticky="W")
+        self.progress_bar = customtkinter.CTkProgressBar(master=self.frame_1, width=600)
+        self.progress_bar.grid(row=2, column=2, columnspan=5, pady=10, padx=20, sticky="W")
         self.progress_bar.set(0)
 
         self.button_1 = customtkinter.CTkButton(master=self.frame_1, corner_radius=8,
                                                 command=lambda: [self.destroy(), open_operation_window()],
                                                 text="Main menu", fg_color=("blue", "green"), height=40,
-                                                width=200)
-        self.button_1.grid(row=4, column=2, pady=10, padx=20, sticky="W")
+                                                width=400)
+        self.button_1.grid(row=4, column=2, pady=10, padx=100, sticky="")
 
         self.button_2 = customtkinter.CTkButton(master=self.frame_1, corner_radius=8,
+                                                command=lambda: [self.destroy(), open_log_file()],
+                                                text="Log file", fg_color=("blue", "green"), height=40,
+                                                width=400)
+        self.button_2.grid(row=5, column=2, pady=10, padx=100, sticky="")
+
+        self.button_3 = customtkinter.CTkButton(master=self.frame_1, corner_radius=8,
                                                 command=lambda: [self.destroy()],
-                                                text="End", fg_color=("blue", "green"), height=40,
-                                                width=200)
-        self.button_2.grid(row=4, column=4, pady=10, padx=20, sticky="E")
+                                                text="Exit", fg_color=("blue", "green"), height=40,
+                                                width=400)
+        self.button_3.grid(row=6, column=2, pady=10, padx=100, sticky="")
 
     def on_closing(self):
         self.destroy()
@@ -82,6 +89,32 @@ class ProgressWindow(customtkinter.CTk):
 def open_operation_window():
     operation_window = OperationWindow()
     operation_window.mainloop()
+
+
+def open_log_file():
+    log_window = Tk()
+
+    # specify size of window.
+    log_window.geometry("800x600")
+
+    # Create text widget and specify size.
+    log_text = Text(log_window, height=25, width=500)
+
+    log_file_path = PATH + "/log_file.txt"
+    print(log_file_path)
+    log_file_path = open(log_file_path)  # or tf = open(tf, 'r')
+    data = log_file_path.read()
+    log_text.insert(END, data)
+    log_file_path.close()
+
+    # Create an Exit button.
+    b2 = customtkinter.CTkButton(master=log_window, text="Main menu", corner_radius=8,
+                                 command=lambda: [log_window.destroy(), open_operation_window()],
+                                 fg_color=("blue", "green"), height=40,
+                                 width=200)
+
+    log_text.pack()
+    b2.pack()
 
 
 if __name__ == "__main__":

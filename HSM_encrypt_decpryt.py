@@ -85,7 +85,7 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
 
             elif "final" in item:
                 end = time.time()
-                progress_window.progress_bar.set(number_of_iterations)
+                progress_window.progress_bar.set(1)
                 print("Processed in ! {:.2f} seconds".format(end - start))
                 print(".....encryption finished....")
                 progress_window.terminal_output.configure(text="Processed in ! {:.2f} seconds\n"
@@ -97,6 +97,10 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
                 print("received error frame: {}".format(item["error"]))
                 progress_window.terminal_output.configure(text="received error frame: {}".format(item["error"]))
                 break
+    log_file_path = PATH + "/log_file.txt"
+    if my_os == 'linux':
+        cmd = 'cat > {}'.format(log_file_path)
+        os.system(cmd)
 
 
 async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, file_name, iv):
@@ -138,12 +142,13 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
                 progress_window.progress_bar.set(progress_bar_update)
                 progress_window.update_idletasks()
 
-            elif "plain" in item:
+            if "plain" in item:
                 await plain_out.write(item["plain"])
+                print("{}".format(item["plain"]))
 
             elif "final" in item:
                 end = time.time()
-                progress_window.progress_bar.set(number_of_iterations)
+                progress_window.progress_bar.set(1)
                 print("Process in {:.2f} seconds".format(end - start))
                 print(".....decryption finished....")
                 progress_window.terminal_output.configure(text="Processed in ! {:.2f} seconds\n"
@@ -154,6 +159,11 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
                 progress_window.terminal_output.configure(text="received error frame: {}".format(item["error"]))
                 print("received error frame: {}".format(item["error"]))
                 break
+
+    log_file_path = PATH + "/log_file.txt"
+    if my_os == 'linux':
+        cmd = 'cat > {}'.format(log_file_path)
+        os.system(cmd)
 
 
 async def chunk_input_file(file):
