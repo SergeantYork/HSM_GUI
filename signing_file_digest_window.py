@@ -53,7 +53,7 @@ class SigningProgressWindow(customtkinter.CTk):
         self.label_1.grid(row=1, column=2, pady=10, padx=0, sticky="W")
         self.label_1.configure(font=("Roboto", 20, "bold"))
 
-        self.progress_bar = customtkinter.CTkProgressBar(master=self.frame_1, width=400)
+        self.progress_bar = customtkinter.CTkProgressBar(master=self.frame_1, width=600)
         self.progress_bar.grid(row=2, column=2, columnspan=4, pady=10, padx=20, sticky="W")
         self.progress_bar.set(0)
 
@@ -67,20 +67,20 @@ class SigningProgressWindow(customtkinter.CTk):
         self.button_1 = customtkinter.CTkButton(master=self.frame_1, corner_radius=8,
                                                 command=lambda: [self.destroy(), open_operation_window()],
                                                 text="Main menu", fg_color=("blue", "green"), height=40,
-                                                width=100)
-        self.button_1.grid(row=4, column=2, pady=10, padx=20, sticky="W")
+                                                width=400)
+        self.button_1.grid(row=4, column=2, pady=10, padx=100, sticky="")
 
         self.button_2 = customtkinter.CTkButton(master=self.frame_1, corner_radius=8,
                                                 command=lambda: [self.destroy(), open_log_file()],
-                                                text="Lof file", fg_color=("blue", "green"), height=40,
-                                                width=100)
-        self.button_2.grid(row=4, column=4, pady=10, padx=20, sticky="")
+                                                text="Log file", fg_color=("blue", "green"), height=40,
+                                                width=400)
+        self.button_2.grid(row=5, column=2, pady=10, padx=100, sticky="")
 
         self.button_3 = customtkinter.CTkButton(master=self.frame_1, corner_radius=8,
                                                 command=lambda: [self.destroy()],
                                                 text="End", fg_color=("blue", "green"), height=40,
-                                                width=100)
-        self.button_3.grid(row=4, column=4, pady=10, padx=20, sticky="E")
+                                                width=400)
+        self.button_3.grid(row=6, column=2, pady=10, padx=100, sticky="")
 
     def on_closing(self):
         self.destroy()
