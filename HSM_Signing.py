@@ -201,6 +201,7 @@ def signing(in_data, key_name, operation):
         with open('{}_signature.{}'.format(in_data, file_ending), 'w') as f:
             f.write('Hash signature:')
         append_new_line('{}_signature.{}'.format(in_data, file_ending), signature)
+
         signing_process_window.terminal_output.configure(text=".......SHA3-Signing",
                                                          font=("Roboto", 10, "bold"))
         print(".......SHA3-Signing")
@@ -259,6 +260,7 @@ def signing(in_data, key_name, operation):
 
         verify_result = get_api_instance('signverify').verify(key_uuid, verify_request)
         assert verify_result.result, "SHA2-Signature verification didn't succeed!"
+
         print(".......SHA2-Verification")
         signing_process_window.progress_bar.set(1)
         signing_process_window.update_idletasks()
