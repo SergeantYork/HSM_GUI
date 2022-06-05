@@ -5,7 +5,6 @@ import customtkinter
 import os
 
 from PIL import Image, ImageTk
-
 PATH = os.path.dirname(os.path.realpath(__file__))
 WIDTH = 1600
 HEIGHT = 1200
@@ -17,20 +16,20 @@ customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "gre
 class OperationWindow(customtkinter.CTk):
 
     def button_function(self):
-        from HSM_GUI import signing_file_window
-        from HSM_GUI import signing_digest_window
-        from HSM_GUI import encrypt_file_window
-        from HSM_GUI import decrypt_file_window
+        from my_signing_file_window import SigningFileWindow
+        from my_signing_digest_window import SigningDigestWindow
+        from my_encrypt_file_window import EncryptWindow
+        from my_decrypt_file_window import DecryptWindow
 
         print("operation selected {}".format(self.operation_selection.get()))
         if self.operation_selection.get() == 1:
-            signing_file_window()
+            SigningFileWindow()
         if self.operation_selection.get() == 2:
-            signing_digest_window()
+            SigningDigestWindow()
         if self.operation_selection.get() == 3:
-            encrypt_file_window()
+            EncryptWindow()
         if self.operation_selection.get() == 4:
-            decrypt_file_window()
+            DecryptWindow()
 
     def __init__(self):
         super().__init__()

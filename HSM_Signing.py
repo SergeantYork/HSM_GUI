@@ -9,7 +9,7 @@ import sdkms.v1
 import platform
 
 from sdkms.v1.models.digest_algorithm import DigestAlgorithm
-from signing_file_digest_window import SigningProgressWindow
+from my_signing_file_digest_window import SigningProgressWindow
 from time import sleep
 
 api_instances = {}
@@ -176,7 +176,8 @@ def signing(in_data, key_name, operation):
         result = hash_file(in_data, operation)
 
         result_digest = bytearray(result)
-
+        signing_process_window.terminal_output.configure(text="SHA2-signing process started",
+                                                         font=("Roboto", 10, "bold"))
         signing_process_window.progress_bar.set(0)
         signing_process_window.update_idletasks()
         sleep(2)
@@ -219,6 +220,9 @@ def signing(in_data, key_name, operation):
         if verify_result.result:
             signing_process_window.terminal_output.configure(text="Signature verified",
                                                              font=("Roboto", 10, "bold"))
+            sleep(2)
+            signing_process_window.terminal_output.configure(text="Signature process Ended",
+                                                             font=("Roboto", 10, "bold"))
         else:
             signing_process_window.terminal_output.configure(text="Signature verification failed",
                                                              font=("Roboto", 10, "bold"))
@@ -228,6 +232,8 @@ def signing(in_data, key_name, operation):
         result_digest = bytearray(result)
         signing_process_window.progress_bar.set(0)
         signing_process_window.update_idletasks()
+        signing_process_window.terminal_output.configure(text="SHA2-signing process started",
+                                                         font=("Roboto", 10, "bold"))
         sleep(2)
         print("my digest:{}".format(result_digest))
         print(".......SHA2-Digest Generation")
@@ -270,6 +276,9 @@ def signing(in_data, key_name, operation):
         if verify_result.result:
             signing_process_window.terminal_output.configure(text="Signature verified",
                                                              font=("Roboto", 10, "bold"))
+            sleep(2)
+            signing_process_window.terminal_output.configure(text="Signature process Ended",
+                                                             font=("Roboto", 10, "bold"))
         else:
             signing_process_window.terminal_output.configure(text="Signature verification failed",
                                                              font=("Roboto", 10, "bold"))
@@ -281,12 +290,19 @@ def signing_digest(in_data, key_name, operation):
 
     print("signing:{}".format(operation))
     # "SHA2-256", "SHA3-256"
+    print("signing:{}".format(operation))
+    signing_process_window = SigningProgressWindow()
     key_uuid = get_key_id(key_name)
 
     if operation == 'SHA3-256':
         fh = open("{}".format(in_data), 'rb')
         result_digest = bytearray(fh.read)
 
+        signing_process_window.terminal_output.configure(text="SHA2-signing process started",
+                                                         font=("Roboto", 10, "bold"))
+        signing_process_window.progress_bar.set(0)
+        signing_process_window.update_idletasks()
+        sleep(2)
         print("my digest:{}".format(result_digest))
 
         sign_request = sdkms.v1.SignRequest(hash_alg=DigestAlgorithm.SHA3_256, hash=result_digest)
@@ -303,18 +319,41 @@ def signing_digest(in_data, key_name, operation):
             f.write('Hash signature:')
         append_new_line('{}_signature.{}'.format(in_data, file_ending), signature)
 
+        signing_process_window.terminal_output.configure(text=".......SHA3-Signing",
+                                                         font=("Roboto", 10, "bold"))
         print(".......SHA3-Signing")
+        signing_process_window.progress_bar.set(0.66)
+        signing_process_window.update_idletasks()
+        sleep(2)
+
         verify_request = sdkms.v1.VerifyRequest(hash_alg=DigestAlgorithm.SHA3_256, hash=result_digest,
                                                 signature=sign_result.signature)
 
         verify_result = get_api_instance('signverify').verify(key_uuid, verify_request)
         assert verify_result.result, "SHA3-Signature verification didn't succeed!"
         print(".......SHA3-Verification")
+        signing_process_window.progress_bar.set(1)
+        signing_process_window.update_idletasks()
+
+        if verify_result.result:
+            signing_process_window.terminal_output.configure(text="Signature verified",
+                                                             font=("Roboto", 10, "bold"))
+            sleep(2)
+            signing_process_window.terminal_output.configure(text="Signature process Ended",
+                                                             font=("Roboto", 10, "bold"))
+        else:
+            signing_process_window.terminal_output.configure(text="Signature verification failed",
+                                                             font=("Roboto", 10, "bold"))
 
     if operation == 'SHA2-256':
         fh = open("{}".format(in_data), 'rb')
         result_digest = bytearray(fh.read)
         print("my digest:{}".format(result_digest))
+        signing_process_window.progress_bar.set(0)
+        signing_process_window.update_idletasks()
+        signing_process_window.terminal_output.configure(text="SHA2-signing process started",
+                                                         font=("Roboto", 10, "bold"))
+        sleep(2)
 
         sign_request = sdkms.v1.SignRequest(hash_alg=DigestAlgorithm.SHA256, hash=result_digest)
         sign_result = get_api_instance('signverify').sign(key_uuid, sign_request)
@@ -331,12 +370,30 @@ def signing_digest(in_data, key_name, operation):
 
         append_new_line('{}_signature.{}'.format(in_data, file_ending), signature)
 
+        signing_process_window.terminal_output.configure(text="SHA2 Signing",
+                                                         font=("Roboto", 10, "bold"))
         print(".......SHA2-Signing")
+        signing_process_window.progress_bar.set(0.66)
+        signing_process_window.update_idletasks()
+        sleep(2)
         verify_request = sdkms.v1.VerifyRequest(hash_alg=DigestAlgorithm.SHA256, hash=result_digest,
                                                 signature=sign_result.signature)
 
         verify_result = get_api_instance('signverify').verify(key_uuid, verify_request)
         assert verify_result.result, "SHA2-Signature verification didn't succeed!"
+
+        signing_process_window.progress_bar.set(1)
+        signing_process_window.update_idletasks()
+
+        if verify_result.result:
+            signing_process_window.terminal_output.configure(text="Signature verified",
+                                                             font=("Roboto", 10, "bold"))
+            sleep(2)
+            signing_process_window.terminal_output.configure(text="Signature process Ended",
+                                                             font=("Roboto", 10, "bold"))
+        else:
+            signing_process_window.terminal_output.configure(text="Signature verification failed",
+                                                             font=("Roboto", 10, "bold"))
         print(".......SHA2-Verification")
 
 

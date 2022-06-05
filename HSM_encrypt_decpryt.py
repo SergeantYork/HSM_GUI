@@ -8,7 +8,7 @@ import aioitertools
 import cbor2
 import os
 import io
-from encryption_decryption_process_window import ProgressWindow
+from my_encryption_decryption_process_window import ProgressWindow
 
 my_os = platform.system()
 if my_os == 'linux':
@@ -137,14 +137,12 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
             if item != "final":
                 if i < (number_of_iterations - 1):
                     i = i + 1
-                print("print not final")
                 progress_bar_update = (i / number_of_iterations)
                 progress_window.progress_bar.set(progress_bar_update)
                 progress_window.update_idletasks()
 
             if "plain" in item:
                 await plain_out.write(item["plain"])
-                print("{}".format(item["plain"]))
 
             elif "final" in item:
                 end = time.time()

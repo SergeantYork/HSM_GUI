@@ -94,6 +94,8 @@ def open_operation_window():
 def open_log_file():
     log_window = Tk()
 
+    y_padding = 15
+
     # specify size of window.
     log_window.geometry("800x600")
 
@@ -108,13 +110,18 @@ def open_log_file():
     log_file_path.close()
 
     # Create an Exit button.
-    b2 = customtkinter.CTkButton(master=log_window, text="Main menu", corner_radius=8,
-                                 command=lambda: [log_window.destroy(), open_operation_window()],
-                                 fg_color=("blue", "green"), height=40,
-                                 width=200)
+    button_1 = customtkinter.CTkButton(master=log_window, text="Main menu", corner_radius=8,
+                                       command=lambda: [log_window.destroy(), open_operation_window()],
+                                       fg_color=("blue", "green"), height=40,
+                                       width=400)
 
+    button_2 = customtkinter.CTkButton(master=log_window, text="End", corner_radius=8,
+                                       command=lambda: [log_window.destroy()],
+                                       fg_color=("blue", "green"), height=40,
+                                       width=400)
     log_text.pack()
-    b2.pack()
+    button_1.pack(pady=y_padding)
+    button_2.pack(pady=y_padding)
 
 
 if __name__ == "__main__":
