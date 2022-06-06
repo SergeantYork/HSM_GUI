@@ -1,9 +1,8 @@
 import tkinter
 import tkinter.messagebox
-from tkinter import CENTER, W, E, END, BOTTOM, Tk, Frame, LEFT, Button, Text
+from tkinter import CENTER, END, Tk, Text
 import customtkinter
 import os
-import platform
 
 from PIL import Image, ImageTk
 from my_operation_window import OperationWindow
@@ -20,7 +19,7 @@ class SigningProgressWindow(customtkinter.CTk):
 
     def __init__(self):
         super().__init__()
-        self.title("Faurecia HSM Tool")
+        self.title("Faurecia HSM Application")
         self.geometry(f"{WIDTH}x{HEIGHT}")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)  # call .on_closing() when app gets closed
 

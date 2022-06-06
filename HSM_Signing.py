@@ -6,10 +6,9 @@ import os
 import hashlib
 import sdkms
 import sdkms.v1
-import platform
 
 from sdkms.v1.models.digest_algorithm import DigestAlgorithm
-from my_signing_file_digest_window import SigningProgressWindow
+from my_signing_file_digest_process_window import SigningProgressWindow
 from time import sleep
 
 api_instances = {}

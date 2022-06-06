@@ -1,6 +1,6 @@
 import tkinter
 import tkinter.messagebox
-from tkinter import CENTER, W, E
+from tkinter import CENTER
 import customtkinter
 import os
 
@@ -34,7 +34,7 @@ class OperationWindow(customtkinter.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("Faurecia HSM Tool")
+        self.title("Faurecia HSM Application")
         self.geometry(f"{WIDTH}x{HEIGHT}")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)  # call .on_closing() when app gets closed
 

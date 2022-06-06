@@ -11,7 +11,7 @@ import io
 from my_encryption_decryption_process_window import ProgressWindow
 
 my_os = platform.system()
-if my_os == 'linux':
+if my_os == 'Linux':
     import uvloop
 
 BLOCK_SIZE = 511 * 1024

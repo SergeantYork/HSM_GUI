@@ -55,7 +55,7 @@ class SigningDigestWindow(customtkinter.CTk):
 
         self.frame_1.grid(row=0, column=1, padx=10, pady=y_padding)
 
-        self.label_1 = customtkinter.CTkLabel(master=self.frame_1, text="signing digest window")
+        self.label_1 = customtkinter.CTkLabel(master=self.frame_1, text="Signing digest window")
         self.label_1.grid(row=1, column=2, pady=10, padx=0, sticky="W")
         self.label_1.configure(font=("Roboto", 20, "bold"))
 

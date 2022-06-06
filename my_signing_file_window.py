@@ -1,13 +1,13 @@
 import tkinter
 import tkinter.messagebox
-from tkinter import CENTER, W, E, END, BOTTOM, Tk, Frame, LEFT, Button, Text
+from tkinter import CENTER, END, Tk, Text
 import customtkinter
 import os
 
 from tkinter import filedialog
 from PIL import Image, ImageTk
 from my_operation_window import OperationWindow
-from HSM_Signing import call_streaming_signing
+from my_HSM_Signing import call_streaming_signing  # previous version HSM_Signing
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 WIDTH = 1600
@@ -55,7 +55,7 @@ class SigningFileWindow(customtkinter.CTk):
 
         self.frame_1.grid(row=0, column=1, padx=10, pady=y_padding)
 
-        self.label_1 = customtkinter.CTkLabel(master=self.frame_1, text="signing file window")
+        self.label_1 = customtkinter.CTkLabel(master=self.frame_1, text="Signing file window")
         self.label_1.grid(row=1, column=2, pady=10, padx=0, sticky="W")
         self.label_1.configure(font=("Roboto", 20, "bold"))
 
