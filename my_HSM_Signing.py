@@ -4,7 +4,10 @@ import time
 import hashlib
 import base64
 import os
+import sys
 
+
+from io import StringIO
 from my_signing_file_digest_process_window import SigningProgressWindow
 from time import sleep
 
@@ -25,17 +28,25 @@ def append_new_line(file_name, text_to_append):
         file_object.write(text_to_append)
 
 
-def get_auth(api_endpoint, api_key):
+def get_auth(api_endpoint, api_key, signing_process_window):
     url = "{}/sys/v1/session/auth".format(api_endpoint)
 
     payload = {}
     headers = {'Authorization': 'Basic {}'.format(api_key)}
 
     response = requests.request("POST", url, headers=headers, data=payload)
-    return response.json()["access_token"]
+
+    if response.status_code == 401:
+        signing_process_window.terminal_output.configure(text="Wrong API key, unable to authenticate close session "
+                                                              "please check log file",
+                                                         font=("Roboto", 8, "bold"))
+    response_json = response.json()
+    response_print = json.dumps(response_json)
+    print("get_auth{}".format(response_print))
+    return response_json["access_token"]
 
 
-def gen_auth_request_for_sign(token, api_endpoint, key, hash_value, alg):
+def gen_auth_request_for_sign(token, api_endpoint, key, hash_value, alg, signing_process_window):
     url = "{}/sys/v1/approval_requests".format(api_endpoint)
     payload = json.dumps({
         "method": "POST",
@@ -54,8 +65,14 @@ def gen_auth_request_for_sign(token, api_endpoint, key, hash_value, alg):
     }
 
     response = requests.request("POST", url, headers=headers, data=payload)
-
-    return response.json()["request_id"]
+    if response.status_code == 404:
+        signing_process_window.terminal_output.configure(text="Wrong key name or hash value, close session and check"
+                                                              "log file",
+                                                         font=("Roboto", 8, "bold"))
+    response_json = response.json()["request_id"]
+    response_print = json.dumps(response_json)
+    print("gen_auth_request_for_sign{}".format(response_print))
+    return response_json
 
 
 def check_request_status(token, api_endpoint):
@@ -66,10 +83,13 @@ def check_request_status(token, api_endpoint):
         'Authorization': 'Bearer {}'.format(token)
     }
     response = requests.request("GET", url, headers=headers, data=payload)
-    return response.json()
+    response_json = response.json()
+    response_print = json.dumps(response_json)
+    print("check_request_status{}".format(response_print))
+    return response_json
 
 
-def get_sign(api_endpoint, token, request_id):
+def get_sign(api_endpoint, token, request_id, signing_process_window):
     url = "{}/sys/v1/approval_requests/{}/result".format(api_endpoint, request_id)
 
     payload = {}
@@ -78,8 +98,13 @@ def get_sign(api_endpoint, token, request_id):
         'Authorization': 'Bearer {}'.format(token)
     }
     response = requests.request("POST", url, headers=headers, data=payload)
-
-    return response.json()
+    if response.status_code == 401:
+        signing_process_window.terminal_output.configure(text="An Error occurred during signing please check log file",
+                                                         font=("Roboto", 10, "bold"))
+    response_json = response.json()
+    response_print = json.dumps(response_json)
+    print("get_sign{}".format(response_print))
+    return response_json
 
 
 def hash_file(filename, operation):
@@ -108,6 +133,7 @@ def hash_file(filename, operation):
 
 def signing_digest(api_endpoint, api_key, in_data, out_data, key_name, operation):
     signing_process_window = SigningProgressWindow()
+
     fh = open("{}".format(in_data), 'rb')
     result_digest = bytearray(fh.read)
     hash_value = base64.b64encode(result_digest).decode("utf-8")
@@ -119,7 +145,7 @@ def signing_digest(api_endpoint, api_key, in_data, out_data, key_name, operation
                                                      font=("Roboto", 10, "bold"))
     signing_process_window.progress_bar.set(0)
     signing_process_window.update_idletasks()
-    sleep(2)
+    sleep(1)
 
     if operation == 'SHA3-256':
         alg = 'Sha3256'
@@ -176,8 +202,8 @@ def signing(api_endpoint, api_key, in_data, out_data, key_name, operation):
         alg = 'Sha3256'
     if operation == 'SHA2-256':
         alg = 'Sha256'
-    token = get_auth(api_endpoint, api_key)
-    request_id = gen_auth_request_for_sign(token, api_endpoint, key, hash_value, alg)
+    token = get_auth(api_endpoint, api_key, signing_process_window)
+    request_id = gen_auth_request_for_sign(token, api_endpoint, key, hash_value, alg, signing_process_window)
 
     signing_process_window.terminal_output.configure(text="SHA2-digest",
                                                      font=("Roboto", 10, "bold"))
@@ -196,7 +222,7 @@ def signing(api_endpoint, api_key, in_data, out_data, key_name, operation):
     sleep(2)
 
     while match['status'] == 'PENDING':
-        status = check_request_status(token, api_endpoint)
+        status = check_request_status(token, api_endpoint, signing_process_window)
         match = next(d for d in status if d['request_id'] == request_id)
         time.sleep(0.25)
     print('request approved getting signature')
@@ -205,7 +231,7 @@ def signing(api_endpoint, api_key, in_data, out_data, key_name, operation):
                                                      font=("Roboto", 10, "bold"))
     signing_process_window.progress_bar.set(1)
     signing_process_window.update_idletasks()
-    signature_string = get_sign(api_endpoint, token, request_id)
+    signature_string = get_sign(api_endpoint, token, request_id, signing_process_window)
 
     file_name = str(in_data)
     file_ending = file_name.split(".")

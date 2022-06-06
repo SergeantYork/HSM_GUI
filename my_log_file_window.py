@@ -51,7 +51,6 @@ class OpenLogFileWindow(customtkinter.CTk):
         self.label_1.pack(pady=y_padding)
         self.label_1.configure(font=("Roboto", 20, "bold"))
 
-        # Create text widget and specify size.
         log_text = Text(self.frame_1, height=25, width=500)
 
         log_file_path = PATH + "/log_file.txt"

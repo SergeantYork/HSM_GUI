@@ -27,7 +27,6 @@ def create_and_start_collecting_to_log_file():
 
         # re-open stdout without buffering
         sys.stdout = os.fdopen(sys.stdout.fileno(), 'w')
-
         # redirect stdout and stderr to the log file opened above
         os.dup2(so.fileno(), sys.stdout.fileno())
         os.dup2(se.fileno(), sys.stderr.fileno())
