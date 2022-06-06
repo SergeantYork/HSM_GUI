@@ -107,7 +107,54 @@ def hash_file(filename, operation):
 
 
 def signing_digest(api_endpoint, api_key, in_data, out_data, key_name, operation):
-    print("balalalaslds")
+    signing_process_window = SigningProgressWindow()
+    fh = open("{}".format(in_data), 'rb')
+    result_digest = bytearray(fh.read)
+    hash_value = base64.b64encode(result_digest).decode("utf-8")
+    api_key = api_key
+    api_endpoint = api_endpoint
+    key = key_name
+
+    signing_process_window.terminal_output.configure(text="SHA2-signing process started",
+                                                     font=("Roboto", 10, "bold"))
+    signing_process_window.progress_bar.set(0)
+    signing_process_window.update_idletasks()
+    sleep(2)
+
+    if operation == 'SHA3-256':
+        alg = 'Sha3256'
+    if operation == 'SHA2-256':
+        alg = 'Sha256'
+    token = get_auth(api_endpoint, api_key)
+    request_id = gen_auth_request_for_sign(token, api_endpoint, key, hash_value, alg)
+
+    match = {'status': 'PENDING'}
+    signing_process_window.terminal_output.configure(text="SHA2-signing pending for quorum approval",
+                                                     font=("Roboto", 10, "bold"))
+    signing_process_window.progress_bar.set(0.66)
+    signing_process_window.update_idletasks()
+    sleep(2)
+
+    while match['status'] == 'PENDING':
+        status = check_request_status(token, api_endpoint)
+        match = next(d for d in status if d['request_id'] == request_id)
+        time.sleep(0.25)
+    print('request approved getting signature')
+
+    signing_process_window.terminal_output.configure(text="SHA2-signing approved",
+                                                     font=("Roboto", 10, "bold"))
+    signing_process_window.progress_bar.set(1)
+    signing_process_window.update_idletasks()
+    full_status_string = get_sign(api_endpoint, token, request_id)
+
+    file_name = str(in_data)
+    file_ending = file_name.split(".")
+    file_ending = file_ending[-1]
+
+    with open('{}_signature.{}'.format(in_data, file_ending), 'w') as f:
+        f.write('Request response:')
+
+    append_new_line('{}_signature.{}'.format(in_data, file_ending), "{}".format(full_status_string))
 
 
 def signing(api_endpoint, api_key, in_data, out_data, key_name, operation):
@@ -165,7 +212,7 @@ def signing(api_endpoint, api_key, in_data, out_data, key_name, operation):
     file_ending = file_ending[-1]
 
     with open('{}_signature.{}'.format(in_data, file_ending), 'w') as f:
-        f.write('Hash signature:')
+        f.write('Request response:')
 
     append_new_line('{}_signature.{}'.format(in_data, file_ending), "{}".format(signature_string))
 
