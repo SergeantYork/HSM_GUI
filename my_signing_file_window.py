@@ -123,39 +123,6 @@ def open_operation_window():
     operation_window.mainloop()
 
 
-def open_log_file():
-    log_window = Tk()
-
-    y_padding = 15
-
-    # specify size of window.
-    log_window.geometry("800x600")
-
-    # Create text widget and specify size.
-    log_text = Text(log_window, height=25, width=500)
-
-    log_file_path = PATH + "/log_file.txt"
-    print(log_file_path)
-    log_file_path = open(log_file_path)  # or tf = open(tf, 'r')
-    data = log_file_path.read()
-    log_text.insert(END, data)
-    log_file_path.close()
-
-    # Create an Exit button.
-    button_1 = customtkinter.CTkButton(master=log_window, text="Main menu", corner_radius=8,
-                                       command=lambda: [log_window.destroy(), open_operation_window()],
-                                       fg_color=("blue", "green"), height=40,
-                                       width=400)
-
-    button_2 = customtkinter.CTkButton(master=log_window, text="End", corner_radius=8,
-                                       command=lambda: [log_window.destroy()],
-                                       fg_color=("blue", "green"), height=40,
-                                       width=400)
-    log_text.pack()
-    button_1.pack(pady=y_padding)
-    button_2.pack(pady=y_padding)
-
-
 if __name__ == "__main__":
     signing_file_window = SigningFileWindow()
     signing_file_window.mainloop()

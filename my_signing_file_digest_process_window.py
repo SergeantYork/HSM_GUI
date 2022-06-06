@@ -6,7 +6,7 @@ import os
 
 from PIL import Image, ImageTk
 from my_operation_window import OperationWindow
-
+from my_log_file_window import OpenLogFileWindow
 PATH = os.path.dirname(os.path.realpath(__file__))
 WIDTH = 1200
 HEIGHT = 800
@@ -70,7 +70,7 @@ class SigningProgressWindow(customtkinter.CTk):
         self.button_1.grid(row=4, column=2, pady=10, padx=100, sticky="")
 
         self.button_2 = customtkinter.CTkButton(master=self.frame_1, corner_radius=8,
-                                                command=lambda: [self.destroy(), open_log_file()],
+                                                command=lambda: [self.destroy(), OpenLogFileWindow()],
                                                 text="Log file", fg_color=("blue", "green"), height=40,
                                                 width=400)
         self.button_2.grid(row=5, column=2, pady=10, padx=100, sticky="")
@@ -97,6 +97,7 @@ def open_log_file():
 
     # specify size of window.
     log_window.geometry("800x600")
+    log_window.title("Faurecia HSM Application")
 
     # Create text widget and specify size.
     log_text = Text(log_window, height=25, width=500)
