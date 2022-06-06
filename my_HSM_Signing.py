@@ -4,10 +4,7 @@ import time
 import hashlib
 import base64
 import os
-import sys
 
-
-from io import StringIO
 from my_signing_file_digest_process_window import SigningProgressWindow
 from time import sleep
 
