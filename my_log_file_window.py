@@ -46,7 +46,7 @@ class OpenLogFileWindow(customtkinter.CTk):
         self.image_2.grid(row=1, column=1)
 
         self.frame_1.grid(row=0, column=1, padx=10, pady=y_padding)
-
+        self.frame_1.configure(bg ='')
         self.label_1 = customtkinter.CTkLabel(master=self.frame_1, text="Log File")
         self.label_1.pack(pady=y_padding)
         self.label_1.configure(font=("Roboto", 20, "bold"))
