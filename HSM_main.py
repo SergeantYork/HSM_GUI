@@ -33,7 +33,7 @@ def create_and_start_collecting_to_log_file():
 
 
 def main():
-    create_and_start_collecting_to_log_file()
+    # create_and_start_collecting_to_log_file()
 
     operation_window = OperationWindow()
     operation_window.mainloop()

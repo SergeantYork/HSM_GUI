@@ -106,13 +106,13 @@ class SigningFileWindow(customtkinter.CTk):
                                                 command=lambda: [browse_files()],
                                                 text="Select a file", fg_color=("blue", "green"), height=40,
                                                 width=50)
-        self.button_2.grid(row=4, column=2, columnspan=2, pady=10, padx=20, sticky="E")
+        self.button_2.grid(row=5, column=2, columnspan=2, pady=10, padx=20, sticky="E")
 
         self.button_1 = customtkinter.CTkButton(master=self.frame_1, corner_radius=8,
                                                 command=lambda: [self.destroy(), sign()],
                                                 text="Sign", fg_color=("blue", "green"), height=40,
                                                 width=400)
-        self.button_1.grid(row=5, column=2, pady=10, padx=20, sticky="W")
+        self.button_1.grid(row=6, column=2, pady=10, padx=20, sticky="W")
 
     def on_closing(self):
         self.destroy()

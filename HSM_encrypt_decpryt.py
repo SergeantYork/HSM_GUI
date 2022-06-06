@@ -8,6 +8,7 @@ import aioitertools
 import cbor2
 import os
 import io
+
 from my_encryption_decryption_process_window import ProgressWindow
 
 my_os = platform.system()
@@ -39,6 +40,8 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
     file_stat = os.stat(file_name)
     number_of_iterations = (file_stat.st_size / BLOCK_SIZE)
     i = 0
+    progress_window.progress_bar.set(0)
+    progress_window.update_idletasks()
     progress_window.terminal_output.configure(text="Encryption started",
                                               font=("Roboto", 10, "bold"))
     start = time.time()
@@ -55,8 +58,8 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
                            ) as response:
         if response.status != 200:
             print("HTTP error: {}: {}".format(response.status, await response.text()))
-            progress_window.terminal_output.configure("HTTP error: {}: {}".format(response.status,
-                                                                                  await response.text()),
+            progress_window.terminal_output.configure(text="HTTP error:{} please check log file"
+                                                      .format(await response.text()),
                                                       font=("Roboto", 10, "bold"))
             return
 
@@ -109,6 +112,8 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
     file_stat = os.stat(file_name)
     number_of_iterations = (file_stat.st_size / BLOCK_SIZE)
     i = 0
+    progress_window.progress_bar.set(0)
+    progress_window.update_idletasks()
     progress_window.terminal_output.configure(text="Decryption started",
                                               font=("Roboto", 10, "bold"))
     plain_chunks = chunk_input_file(cipher_in)
