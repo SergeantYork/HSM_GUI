@@ -213,8 +213,8 @@ def signing(api_endpoint, api_key, in_data, out_data, key_name, operation):
 
     with open('{}_signature.{}'.format(in_data, file_ending), 'w') as f:
         f.write('Request response:')
-
-    append_new_line('{}_signature.{}'.format(in_data, file_ending), "{}".format(signature_string))
+    append_new_line('{}_signature.{}'.format(in_data, file_ending),
+                    "{}".format(signature_string))
 
 
 def main(api_endpoint, api_key, in_data, out_data, key_name, operation, digest):
