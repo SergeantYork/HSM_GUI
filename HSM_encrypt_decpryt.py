@@ -59,7 +59,7 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
                            ) as response:
         if response.status != 200:
             print("HTTP error: {}".format(await response.text()))
-            progress_window.terminal_output.configure(text="{} please check log file"
+            progress_window.terminal_output.configure(text="Wrong key {} please close session and check log file"
                                                       .format(await response.text()),
                                                       font=("Roboto", 10, "bold"))
             return
@@ -136,8 +136,9 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
                            ) as response:
         if response.status != 200:
             print("HTTP error: {}".format(await response.text()))
-            progress_window.terminal_output.configure(text="{}".format(await response.text()),
-                                                      font=("Roboto", 10, "bold"))
+            progress_window.terminal_output.configure(text="Wrong key {} please close session and check log file"
+                                                      .format(await response.text()),
+                                                      font=("Roboto", 8, "bold"))
             return
 
         # for demonstration; in real impl improve error handling
@@ -206,7 +207,7 @@ async def get_auth(client, api_endpoint, api_key):
                            headers={"Authorization": "Basic {}".format(api_key)}
                            ) as response:
         response_status = response.status
-        if response_status == 401:
+        if response_status != 200:
             progress_window = ProgressWindow()
             progress_window.progress_bar.set(0)
             progress_window.update_idletasks()
