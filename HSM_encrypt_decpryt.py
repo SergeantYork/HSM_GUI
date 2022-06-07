@@ -59,7 +59,7 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
                            ) as response:
         if response.status != 200:
             print("HTTP error: {}".format(await response.text()))
-            progress_window.terminal_output.configure(text="HTTP error:{} please check log file"
+            progress_window.terminal_output.configure(text="{} please check log file"
                                                       .format(await response.text()),
                                                       font=("Roboto", 10, "bold"))
             return
@@ -136,7 +136,7 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
                            ) as response:
         if response.status != 200:
             print("HTTP error: {}".format(await response.text()))
-            progress_window.terminal_output.configure(text="HTTP error:{}".format(await response.text()),
+            progress_window.terminal_output.configure(text="{}".format(await response.text()),
                                                       font=("Roboto", 10, "bold"))
             return
 

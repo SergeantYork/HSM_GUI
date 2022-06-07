@@ -219,7 +219,7 @@ def signing(api_endpoint, api_key, in_data, out_data, key_name, operation):
     sleep(2)
 
     while match['status'] == 'PENDING':
-        status = check_request_status(token, api_endpoint, signing_process_window)
+        status = check_request_status(token, api_endpoint)
         match = next(d for d in status if d['request_id'] == request_id)
         time.sleep(0.25)
     print('request approved getting signature')

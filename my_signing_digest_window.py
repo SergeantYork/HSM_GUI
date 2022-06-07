@@ -7,7 +7,7 @@ from tkinter import CENTER, END, Tk, Text
 from tkinter import filedialog
 from PIL import Image, ImageTk
 from my_operation_window import OperationWindow
-from HSM_Signing import call_streaming_signing
+from my_HSM_Signing import call_streaming_signing
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 WIDTH = 1200
