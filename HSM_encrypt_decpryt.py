@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import asyncio
 import platform
+import string
 import time
 import aiofiles
 import aiohttp
@@ -57,7 +58,7 @@ async def encrypt(plain_in, cipher_out, key_name, bearer, client, api_endpoint, 
                            data=request_bytes
                            ) as response:
         if response.status != 200:
-            print("HTTP error: {}: {}".format(response.status, await response.text()))
+            print("HTTP error: {}".format(await response.text()))
             progress_window.terminal_output.configure(text="HTTP error:{} please check log file"
                                                       .format(await response.text()),
                                                       font=("Roboto", 10, "bold"))
@@ -118,10 +119,15 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
                                               font=("Roboto", 10, "bold"))
     plain_chunks = chunk_input_file(cipher_in)
     print("decryption started")
+    error = all(c in string.hexdigits for c in iv)
+    if not error:
+        progress_window.terminal_output.configure(text="IV is not right please close session and check log file")
+
     request_items = aioitertools.chain(
         ({"init": {"key": {"name": key_name}, "mode": "CBC", "iv": bytes.fromhex(iv)}},),
         ({"cipher": bytes(chunk)} async for chunk in plain_chunks),
         ({"final": {}},))
+
     request_bytes = (cbor2.dumps(item) async for item in request_items)
 
     async with client.post("{}/crypto/v1/stream/decrypt".format(api_endpoint),
@@ -129,9 +135,8 @@ async def decrypt(cipher_in, plain_out, key_name, bearer, client, api_endpoint, 
                            data=request_bytes
                            ) as response:
         if response.status != 200:
-            print("HTTP error: {}: {}".format(response.status, await response.text()))
-            progress_window.terminal_output.configure(text="HTTP error: {}: {}".format(response.status,
-                                                                                       await response.text()),
+            print("HTTP error: {}".format(await response.text()))
+            progress_window.terminal_output.configure(text="HTTP error:{}".format(await response.text()),
                                                       font=("Roboto", 10, "bold"))
             return
 
@@ -200,6 +205,13 @@ async def get_auth(client, api_endpoint, api_key):
     async with client.post("{}/sys/v1/session/auth".format(api_endpoint),
                            headers={"Authorization": "Basic {}".format(api_key)}
                            ) as response:
+        response_status = response.status
+        if response_status == 401:
+            progress_window = ProgressWindow()
+            progress_window.progress_bar.set(0)
+            progress_window.update_idletasks()
+            progress_window.terminal_output.configure(text="Wrong API key please close session and check log file",
+                                                      font=("Roboto", 10, "bold"))
         body = await response.json()
         return body["access_token"]
 
