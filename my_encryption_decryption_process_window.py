@@ -4,6 +4,7 @@ from tkinter import CENTER, W, E, END, BOTTOM, Tk, Frame, LEFT, Button, Text
 import customtkinter
 import os
 
+from HSM_main import VERSION
 from PIL import Image, ImageTk
 from my_operation_window import OperationWindow
 from my_log_file_window import OpenLogFileWindow
@@ -62,6 +63,10 @@ class ProgressWindow(customtkinter.CTk):
         self.progress_bar = customtkinter.CTkProgressBar(master=self.frame_1, width=600)
         self.progress_bar.grid(row=2, column=2, columnspan=5, pady=10, padx=20, sticky="W")
         self.progress_bar.set(0)
+
+        self.label_version = customtkinter.CTkLabel(master=self.frame_1, text="Version {}".format(VERSION))
+        self.label_version.grid(row=7, column=2, pady=10, padx=0, sticky="E")
+        self.label_version.configure(font=("Roboto", 6, "bold"))
 
         self.button_1 = customtkinter.CTkButton(master=self.frame_1, corner_radius=8,
                                                 command=lambda: [self.destroy(), open_operation_window()],

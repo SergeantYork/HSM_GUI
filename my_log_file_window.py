@@ -1,9 +1,10 @@
 import tkinter
 import tkinter.messagebox
-from tkinter import CENTER, END, Text
+from tkinter import CENTER, END, Text, RIGHT
 import customtkinter
 import os
 
+from HSM_main import VERSION
 from PIL import Image, ImageTk
 from my_operation_window import OperationWindow
 
@@ -35,7 +36,7 @@ class OpenLogFileWindow(customtkinter.CTk):
         self.image_label.place(relx=0.5, rely=0.5, anchor=CENTER)
 
         # ============ frames ============
-        y_padding = 15
+        y_padding = 5
 
         self.frame_1 = customtkinter.CTkFrame(master=self, corner_radius=15)
 
@@ -46,33 +47,36 @@ class OpenLogFileWindow(customtkinter.CTk):
         self.image_2.grid(row=1, column=1)
 
         self.frame_1.grid(row=0, column=1, padx=10, pady=y_padding)
-        self.frame_1.configure(bg ='')
+        self.frame_1.configure(bg='')
         self.label_1 = customtkinter.CTkLabel(master=self.frame_1, text="Log File")
         self.label_1.pack(pady=y_padding)
         self.label_1.configure(font=("Roboto", 20, "bold"))
 
-        log_text = Text(self.frame_1, height=25, width=500)
+        self.log_text = Text(self.frame_1, height=25, width=500)
 
         log_file_path = PATH + "/log_file.txt"
-        print(log_file_path)
         log_file_path = open(log_file_path)  # or tf = open(tf, 'r')
         data = log_file_path.read()
-        log_text.insert(END, data)
+        self.log_text.insert(END, data)
         log_file_path.close()
 
-        # Create an Exit button.
-        button_1 = customtkinter.CTkButton(master=self.frame_1, text="Main menu", corner_radius=8,
-                                           command=lambda: [self.destroy(), open_operation_window()],
-                                           fg_color=("blue", "green"), height=40,
-                                           width=400)
+        self.button_1 = customtkinter.CTkButton(master=self.frame_1, text="Main menu", corner_radius=8,
+                                                command=lambda: [self.destroy(), open_operation_window()],
+                                                fg_color=("blue", "green"), height=40,
+                                                width=400)
 
-        button_2 = customtkinter.CTkButton(master=self.frame_1, text="End", corner_radius=8,
-                                           command=lambda: [self.destroy()],
-                                           fg_color=("blue", "green"), height=40,
-                                           width=400)
-        log_text.pack()
-        button_1.pack(pady=y_padding)
-        button_2.pack(pady=y_padding)
+        self.button_2 = customtkinter.CTkButton(master=self.frame_1, text="Exit", corner_radius=8,
+                                                command=lambda: [self.destroy()],
+                                                fg_color=("blue", "green"), height=40,
+                                                width=400)
+
+        self.label_version = customtkinter.CTkLabel(master=self.frame_1, text="Version {}".format(VERSION))
+        self.label_version.configure(font=("Roboto", 6, "bold"))
+
+        self.log_text.pack()
+        self.button_1.pack(pady=y_padding)
+        self.button_2.pack(pady=y_padding)
+        self.label_version.pack(side=RIGHT)
 
     def on_closing(self):
         self.destroy()

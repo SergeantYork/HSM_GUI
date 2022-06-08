@@ -4,6 +4,7 @@ from tkinter import CENTER, W, E, END, BOTTOM, Tk, Frame, LEFT, Button, Text
 import customtkinter
 import os
 
+from HSM_main import VERSION
 from tkinter import filedialog
 from PIL import Image, ImageTk
 from my_operation_window import OperationWindow
@@ -53,6 +54,10 @@ class DecryptWindow(customtkinter.CTk):
         self.label_1 = customtkinter.CTkLabel(master=self.frame_1, text="Decrypt window")
         self.label_1.grid(row=1, column=2, pady=10, padx=0, sticky="W")
         self.label_1.configure(font=("Roboto", 20, "bold"))
+
+        self.label_version = customtkinter.CTkLabel(master=self.frame_1, text="Version {}".format(VERSION))
+        self.label_version.grid(row=7, column=2, pady=10, padx=0, sticky="E")
+        self.label_version.configure(font=("Roboto", 6, "bold"))
 
         def browse_files():
             file_name = filedialog.askopenfilename(initialdir="/",

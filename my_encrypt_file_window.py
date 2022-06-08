@@ -4,6 +4,7 @@ from tkinter import CENTER, W, E, END, BOTTOM, Tk, Frame, LEFT, Button, Text
 import customtkinter
 import os
 
+from HSM_main import VERSION
 from tkinter import filedialog
 from PIL import Image, ImageTk
 from my_operation_window import OperationWindow
@@ -105,6 +106,10 @@ class EncryptWindow(customtkinter.CTk):
                                                 text="Encrypt", fg_color=("blue", "green"), height=40,
                                                 width=400)
         self.button_1.grid(row=5, column=2, pady=10, padx=20, sticky="W")
+
+        self.label_version = customtkinter.CTkLabel(master=self.frame_1, text="Version {}".format(VERSION))
+        self.label_version.grid(row=7, column=2, pady=10, padx=0, sticky="E")
+        self.label_version.configure(font=("Roboto", 6, "bold"))
 
     def on_closing(self):
         self.destroy()

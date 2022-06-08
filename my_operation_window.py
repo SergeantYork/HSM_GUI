@@ -32,6 +32,8 @@ class OperationWindow(customtkinter.CTk):
             DecryptWindow()
 
     def __init__(self):
+        from HSM_main import VERSION
+
         super().__init__()
 
         self.title("Faurecia HSM Application")
@@ -100,6 +102,10 @@ class OperationWindow(customtkinter.CTk):
                                                 text="Submit", fg_color=("blue", "green"), height=40,
                                                 width=400)
         self.button_1.grid(row=6, column=2, columnspan=2, pady=10, padx=40, sticky="W")
+
+        self.label_version = customtkinter.CTkLabel(master=self.frame_1, text="Version {}".format(VERSION))
+        self.label_version.grid(row=7, column=2, pady=10, padx=0, sticky="E")
+        self.label_version.configure(font=("Roboto", 6, "bold"))
 
     def on_closing(self):
         self.destroy()

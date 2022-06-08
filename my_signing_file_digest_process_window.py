@@ -4,6 +4,7 @@ from tkinter import CENTER, END, Tk, Text
 import customtkinter
 import os
 
+from HSM_main import VERSION
 from PIL import Image, ImageTk
 from my_operation_window import OperationWindow
 from my_log_file_window import OpenLogFileWindow
@@ -80,6 +81,10 @@ class SigningProgressWindow(customtkinter.CTk):
                                                 text="End", fg_color=("blue", "green"), height=40,
                                                 width=400)
         self.button_3.grid(row=6, column=2, pady=10, padx=100, sticky="")
+
+        self.label_version = customtkinter.CTkLabel(master=self.frame_1, text="Version {}".format(VERSION))
+        self.label_version.grid(row=7, column=2, pady=10, padx=0, sticky="E")
+        self.label_version.configure(font=("Roboto", 6, "bold"))
 
     def on_closing(self):
         self.destroy()

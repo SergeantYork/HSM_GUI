@@ -3,7 +3,8 @@ import tkinter.messagebox
 import customtkinter
 import os
 
-from tkinter import CENTER, END, Tk, Text
+from HSM_main import VERSION
+from tkinter import CENTER
 from tkinter import filedialog
 from PIL import Image, ImageTk
 from my_operation_window import OperationWindow
@@ -113,6 +114,10 @@ class SigningDigestWindow(customtkinter.CTk):
                                                 text="Sign", fg_color=("blue", "green"), height=40,
                                                 width=400)
         self.button_1.grid(row=6, column=2, pady=10, padx=20, sticky="W")
+
+        self.label_version = customtkinter.CTkLabel(master=self.frame_1, text="Version {}".format(VERSION))
+        self.label_version.grid(row=7, column=2, pady=10, padx=0, sticky="E")
+        self.label_version.configure(font=("Roboto", 6, "bold"))
 
     def on_closing(self):
         self.destroy()

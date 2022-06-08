@@ -4,6 +4,7 @@ import platform
 
 from my_operation_window import OperationWindow
 
+VERSION = 1
 PATH = os.path.dirname(os.path.realpath(__file__))
 WIDTH = 1200
 HEIGHT = 800
